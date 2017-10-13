@@ -178,7 +178,6 @@ def update_test_cases_in_polarion(path):
 
 if __name__ == "__main__":
     tempest_list = get_tempest_test_list()
-    install_pylarion()
     check_tempest_test_in_polarion(tempest_list, "rhosp-user", path='/tmp/test_tempest_updater')
     #update_test_cases_in_polarion(path='/tmp/test_tempest_updater')
 

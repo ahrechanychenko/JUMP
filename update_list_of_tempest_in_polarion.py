@@ -51,12 +51,6 @@ def get_tempest_test_list():
         list with names of tempest test
 
     """
-    # get latest tempest repo
-    subprocess.check_call("rm -rf /tmp/tempest && git clone http://git.openstack.org/openstack/tempest /tmp/tempest",
-                          shell=True)
-    # install tempest and init configuration
-    subprocess.check_call('pip install /tmp/tempest && cd /tmp/tempest && pip install --upgrade pip && pip install -r requirements.txt',
-                          shell=True)
     # check if we already have tempest workspace
     process = subprocess.Popen("tempest workspace list", shell=True, stdout=subprocess.PIPE)
     out, err = process.communicate()

@@ -175,9 +175,12 @@ def update_test_cases_in_polarion(path):
         subprocess.check_call(cmd,
                               shell=True)
 
+def install_pylarion():
+    subprocess.check_call("./prepare_pylarion.sh", shell=True)
 
 if __name__ == "__main__":
     tempest_list = get_tempest_test_list()
+    install_pylarion()
     check_tempest_test_in_polarion(tempest_list, "rhosp-user", path='/tmp/test_tempest_updater')
     #update_test_cases_in_polarion(path='/tmp/test_tempest_updater')
 

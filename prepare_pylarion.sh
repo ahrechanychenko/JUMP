@@ -11,7 +11,7 @@ cp JUMP/.pylarion ~/
 
 
 echo "Setup Pylarion library"
-cd pylarion && python setup.py install && pip install --upgrade pip && pip install -r requirements.txt && cd ../
+cd pylarion && python setup.py install  && cd ../
 
 echo "Setup Tempest"
 # get latest tempest repo

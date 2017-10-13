@@ -6,6 +6,8 @@ import sys
 import argparse
 import subprocess
 import logging
+import requests
+import json
 
 logging.getLogger('suds.client').setLevel(logging.CRITICAL)
 
@@ -103,7 +105,7 @@ def generate_testcase_xml_file(file_path, project_id, assignee, title, descripti
       <custom-field content="functional" id="testtype"/>
       <custom-field content="setup" id="setup"/>
       <custom-field content="teardown by cleaning the workspace." id="teardown"/>
-      <custom-field content="test" id="automation_script"/>
+      <custom-field content="{github_url}" id="automation_script"/>
     </custom-fields>
   </testcase>
 </testcases>
@@ -111,7 +113,8 @@ def generate_testcase_xml_file(file_path, project_id, assignee, title, descripti
            project_id=project_id,
            title=title,
            description=description,
-           automation_test_id=automation_test_id)
+           automation_test_id=automation_test_id,
+           github_url=get_url_to_file_by_tempest_path(automation_test_id))
     # write file
     with open('{file_path}/{name}.xml'.format(file_path=file_path, name=automation_test_id), mode="w+") as f:
         f.write(template)
@@ -158,7 +161,13 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
             except:
                 continue
 
+                
+def get_url_to_file_by_tempest_path(tempest_path):
+    querry_name = tempest_path.rsplit('.',1)[1]
+    r = requests.get('https://api.github.com/search/code?q={}+repo:openstack/tempest'.format(querry_name))
+    return json.loads(r.content)['items'][0]['html_url']
 
+  
 def update_test_cases_in_polarion(path):
     """ 
         Upload test cases which covering missed tempest tests via curl to stage job 

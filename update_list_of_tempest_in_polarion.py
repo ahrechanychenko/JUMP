@@ -175,8 +175,6 @@ def update_test_cases_in_polarion(path):
         subprocess.check_call(cmd,
                               shell=True)
 
-def install_pylarion():
-    subprocess.check_call("./prepare_pylarion.sh", shell=True)
 
 if __name__ == "__main__":
     tempest_list = get_tempest_test_list()

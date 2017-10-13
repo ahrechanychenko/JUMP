@@ -162,6 +162,8 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
                     print "\n tempest test {} exist in Polarion {} project and covered by {}".format(test.split("[")[0], PROJECT_ID, res)
                 break
             except:
+                if i == 19:
+                    print "due to lot off exception {} was skip".format(test)
                 continue
 
                 

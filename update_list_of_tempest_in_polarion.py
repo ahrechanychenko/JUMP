@@ -22,6 +22,8 @@ parser.add_argument("--polarion_user", default="rhos_machine", type=str,
 
 parser.add_argument("--polarion_password", default="polarion", type=str,
                     help="polarion user in short format, by default - polarion")
+parser.add_argument("--dry-run", type=bool,
+                    help="generate xml files with missed tempest test cases and don't upload them to Polarion")
 args = parser.parse_args()
 
 # check for CA
@@ -39,6 +41,8 @@ sys.setdefaultencoding('utf8')
 PROJECT_ID = args.project_id
 POLARION_USER = args.polarion_user
 POLARION_PASS = args.polarion_user
+DRY_RUN = args.dry-run
+
 
 
 def get_tempest_test_list():
@@ -188,5 +192,9 @@ def update_test_cases_in_polarion(path):
 if __name__ == "__main__":
     tempest_list = get_tempest_test_list()
     check_tempest_test_in_polarion(tempest_list, "rhosp-user", path='/tmp/test_tempest_updater')
-    #update_test_cases_in_polarion(path='/tmp/test_tempest_updater')
+    if DRY_RUN:
+        print "\n dry-run completed, xml files was generate"
+        exit(0)
+    else:
+        update_test_cases_in_polarion(path='/tmp/test_tempest_updater')
 

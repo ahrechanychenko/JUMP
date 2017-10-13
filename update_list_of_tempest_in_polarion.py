@@ -22,7 +22,7 @@ parser.add_argument("--polarion_user", default="rhos_machine", type=str,
 
 parser.add_argument("--polarion_password", default="polarion", type=str,
                     help="polarion user in short format, by default - polarion")
-parser.add_argument("--dry-run", type=bool,
+parser.add_argument("--dry_run", type=bool,
                     help="generate xml files with missed tempest test cases and don't upload them to Polarion")
 args = parser.parse_args()
 
@@ -41,7 +41,7 @@ sys.setdefaultencoding('utf8')
 PROJECT_ID = args.project_id
 POLARION_USER = args.polarion_user
 POLARION_PASS = args.polarion_user
-DRY_RUN = args.dry-run
+DRY_RUN = args.dry_run
 
 
 

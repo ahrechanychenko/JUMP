@@ -147,7 +147,7 @@ def get_test_case_id_by_automation_id(automation_id, project):
 
 def check_tempest_test_in_polarion(tempest_list, assignee, path):
     for test in tempest_list:
-        for i in range(0, 20):
+        for i in range(0, 100):
             try:
                 res = get_test_case_id_by_automation_id(test.split("[")[0], PROJECT_ID)
                 if "Not Found" in res:
@@ -162,7 +162,7 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
                     print "\n tempest test {} exist in Polarion {} project and covered by {}".format(test.split("[")[0], PROJECT_ID, res)
                 break
             except:
-                if i == 19:
+                if i == 99:
                     print "due to lot off exception {} was skip".format(test)
                 continue
 

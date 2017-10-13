@@ -122,6 +122,8 @@ def generate_testcase_xml_file(file_path, project_id, assignee, title, descripti
     # write file
     with open('{file_path}/{name}.xml'.format(file_path=file_path, name=automation_test_id), mode="w+") as f:
         f.write(template)
+    #TODO just for debug, remove after debug was complete
+    subprocess.call("ls -l {}".format(file_path), shell=True)
 
 
 def get_test_case_id_by_automation_id(automation_id, project):

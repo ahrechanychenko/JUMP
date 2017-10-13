@@ -17,4 +17,4 @@ echo "Setup Tempest"
 rm -rf /tmp/tempest && git clone http://git.openstack.org/openstack/tempest /tmp/tempest
 
 # install tempest and init configuration
-pip install tempest/
+pip install /tmp/tempest/

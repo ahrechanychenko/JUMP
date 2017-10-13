@@ -89,7 +89,6 @@ def generate_testcase_xml_file(file_path, project_id, assignee, title, descripti
         automation_test_id: str, automation-test-id for test case 
 
     """
-    print "\n Generate xml file for {}  \n".format(automation_test_id)
 
     # generate content for writing to xml file
     template = """<?xml version="1.0" ?>
@@ -153,6 +152,7 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
             try:
                 res = get_test_case_id_by_automation_id(test.split("[")[0], PROJECT_ID)
                 if "Not Found" in res:
+                    print "{} doesn't exist in Polarion, generate xml for it".format(test.split("[")[0])
                     generate_testcase_xml_file(file_path=path,
                                                project_id=PROJECT_ID,
                                                assignee=assignee,

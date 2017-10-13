@@ -60,7 +60,7 @@ def get_tempest_test_list():
     subprocess.check_call('rm -rf /tmp/test_tempest_updater && mkdir /tmp/test_tempest_updater',
                           shell=True)
     # get list of test
-    process = subprocess.Popen("tempest run -l --config-file /tmp/tempest/cloud-test/.testr.conf",
+    process = subprocess.Popen("cd /tmp/tempest/cloud-test && tempest run -l",
                                shell=True,
                                stdout=subprocess.PIPE)
     out, err = process.communicate()

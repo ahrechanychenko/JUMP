@@ -22,12 +22,12 @@ parser.add_argument("--polarion_password", default="polarion", type=str,
                     help="polarion user in short format, by default - polarion")
 args = parser.parse_args()
 
-"""# check for CA
+# check for CA
 try:
     os.environ["REQUESTS_CA_BUNDLE"]
 except KeyError:
     print "Please set the environment variable REQUESTS_CA_BUNDLE"
-    sys.exit(1)"""
+    sys.exit(1)
 
 # reload sys to use "utf8" instead of "unicode"
 reload(sys)

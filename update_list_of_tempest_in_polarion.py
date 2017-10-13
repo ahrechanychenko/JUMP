@@ -153,7 +153,7 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
                                                description="",
                                                automation_test_id=test.split("[")[0])
                 else:
-                    print "tempest test {} exist in Polarion {} project and covered by {}".format(test.split("[")[0], PROJECT_ID, res)
+                    print "\n tempest test {} exist in Polarion {} project and covered by {}".format(test.split("[")[0], PROJECT_ID, res)
                 break
             except:
                 continue

@@ -6,7 +6,8 @@ git clone https://code.engineering.redhat.com/gerrit/pylarion
 
 echo "Copy Pylarion config to home directory"
 rm -rf ~/.pylarion
-cp rhos-qe-core-installer/tripleo/polarion/.pylarion ~/
+#cp rhos-qe-core-installer/tripleo/polarion/.pylarion ~/
+cp JUMP/.pylarion ~/
 
 
 echo "Setup Pylarion library"

@@ -172,17 +172,11 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
 
                 
 def get_url_to_file_by_tempest_path(tempest_path):
-    import time
+    from github import Github
+    g = Github("levor23", "Passw0rd")
     querry_name = tempest_path.rsplit('.',1)[1]
-    requests.packages.urllib3.disable_warnings()
-    r = requests.get('https://api.github.com/search/code?q={}+repo:openstack/tempest'.format(querry_name), verify=False)
-    if r.status_code != 200:
-        time.sleep(30)
-        r = requests.get('https://api.github.com/search/code?q={}+repo:openstack/tempest'.format(querry_name), verify=False)
-    return json.loads(r.content)['items'][0]['html_url']
-
-        
-
+    code_obj = g.search_code('{}+repo:openstack/tempest'.format(querry_name))
+    return code_obj.get_page(0)[0].html_url
   
 def update_test_cases_in_polarion(path):
     """ 

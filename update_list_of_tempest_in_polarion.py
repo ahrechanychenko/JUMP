@@ -124,33 +124,40 @@ def generate_testcase_xml_file(file_path, project_id, assignee, title, descripti
     os.path.isfile("{}/{name}.xml".format(file_path,name=automation_test_id))
 
 
-def get_test_case_id_by_automation_id(automation_id, project):
+def get_polarion_tempest_test_cases():
     """ 
-        Check if automation_id exist in polarion
-        1) Connect to Polarion and via query 
-        2) return "Not Found" or "Test Case ID"
+        Get all tempest test from polarion
+        1) Connect to Polarion and get test_cases object via querry
+        2) return dicit  {automation-test-id:test_case_id}
 
-        Args:
-            automation_id: str, automation-test-id for test case
-            project: str, Polarion project ID
+
 
         Returns:
-            str: "Not Found" or Polarion Test Case ID
+            dict: {automation-test-id:test_case_id}
 
         """
-    test_case = work_item.TestCase.query(query="automation-test-id:{}".format(automation_id), project_id=project)
-    if len(test_case) == 0:
-        return "Not Found"
-    else:
-        return test_case[0].work_item_id
+    for i in range(0,10):
+        try:
+            test_cases = work_item.TestCase.query(query="automation-test-id:{}".format('tempest.*'), project_id='RHELOpenStackPlatform')
+            break
+        except:
+            continue
+    automation_test_id_dict = {}
+    for test in test_cases:
+        for i in range(0,20):
+            try:
+                automation_test_id_dict[test.get_custom_field('automation-test-id').value.encode()] = test.work_item_id
+                break
+            except:
+                continue
+               
+    return automation_test_id_dict
 
 
 def check_tempest_test_in_polarion(tempest_list, assignee, path):
+    automation_test_id_dict = get_polarion_tempest_test_cases()
     for test in tempest_list:
-        for i in range(0, 100):
-            try:
-                res = get_test_case_id_by_automation_id(test.split("[")[0], PROJECT_ID)
-                if "Not Found" in res:
+                if test.split("[")[0] not in automation_test_id_dict:
                     generate_testcase_xml_file(file_path=path,
                                                project_id=PROJECT_ID,
                                                assignee=assignee,
@@ -159,12 +166,7 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
                                                automation_test_id=test.split("[")[0])
                     print "{} doesn't exist in Polarion, generate xml for it".format(test.split("[")[0])
                 else:
-                    print "\n tempest test {} exist in Polarion {} project and covered by {}".format(test.split("[")[0], PROJECT_ID, res)
-                break
-            except:
-                if i == 99:
-                    print "due to lot off exception {} was skip".format(test)
-                continue
+                    print "\n tempest test {} exist in Polarion {} project and covered by {}".format(test.split("[")[0], PROJECT_ID, automation_test_id_dict[test.split("[")[0]])
 
                 
 def get_url_to_file_by_tempest_path(tempest_path):

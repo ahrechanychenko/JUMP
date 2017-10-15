@@ -18,3 +18,7 @@ rm -rf /tmp/tempest && git clone http://git.openstack.org/openstack/tempest /tmp
 
 # install tempest and init configuration
 pip install /tmp/tempest/
+
+echo "Setup GitHub"
+git clone https://github.com/PyGithub/PyGithub.git
+pip install PyGithub/

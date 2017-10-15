@@ -156,6 +156,8 @@ def get_polarion_tempest_test_cases():
 
 def check_tempest_test_in_polarion(tempest_list, assignee, path):
     automation_test_id_dict = get_polarion_tempest_test_cases()
+    import pprint
+    pprint.pprint(automation_test_id_dict)
     for test in tempest_list:
                 if test.split("[")[0] not in automation_test_id_dict:
                     generate_testcase_xml_file(file_path=path,

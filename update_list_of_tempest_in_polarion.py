@@ -136,7 +136,7 @@ def get_polarion_tempest_test_cases():
             dict: {automation-test-id:test_case_id}
 
         """
-    for i in range(0,10):
+    for i in range(0,50):
         try:
             test_cases = work_item.TestCase.query(query="automation-test-id:{}".format('tempest.*'), project_id='RHELOpenStackPlatform')
             break
@@ -144,7 +144,7 @@ def get_polarion_tempest_test_cases():
             continue
     automation_test_id_dict = {}
     for test in test_cases:
-        for i in range(0,20):
+        for i in range(0,50):
             try:
                 automation_test_id_dict[test.get_custom_field('automation-test-id').value.encode()] = test.work_item_id
                 break

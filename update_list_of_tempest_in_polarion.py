@@ -159,28 +159,30 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
     import pprint
     pprint.pprint(automation_test_id_dict)
     for test in tempest_list:
-                if test.split("[")[0] not in automation_test_id_dict:
-                    generate_testcase_xml_file(file_path=path,
-                                               project_id=PROJECT_ID,
-                                               assignee=assignee,
-                                               title="tempest test which covers {}".format(test.split("[")[0]),
-                                               description="",
-                                               automation_test_id=test.split("[")[0])
-                    print "{} doesn't exist in Polarion, generate xml for it".format(test.split("[")[0])
-                else:
-                    print "\n tempest test {} exist in Polarion {} project and covered by {}".format(test.split("[")[0], PROJECT_ID, automation_test_id_dict[test.split("[")[0]])
+        if test.split("[")[0] not in automation_test_id_dict:
+            generate_testcase_xml_file(file_path=path,
+                                       project_id=PROJECT_ID,
+                                       assignee=assignee,
+                                       title="tempest test which covers {}".format(test.split("[")[0]),
+                                       description="",
+                                       automation_test_id=test.split("[")[0])
+            print "{} doesn't exist in Polarion, generate xml for it".format(test.split("[")[0])
+        else:
+            print "\n tempest test {} exist in Polarion {} project and covered by {}".format(test.split("[")[0], PROJECT_ID, automation_test_id_dict[test.split("[")[0]])
 
                 
 def get_url_to_file_by_tempest_path(tempest_path):
     from github import Github
-    g = Github("levor23", "Passw0rd")
-    querry_name = tempest_path.rsplit('.',1)[1]
     try:
-      code_obj = g.search_code('{}+repo:openstack/tempest'.format(querry_name))
+        g = Github("levor23", "Passw0rd")
+        querry_name = tempest_path.rsplit('.',1)[1]
+        code_obj = g.search_code('{}+repo:openstack/tempest'.format(querry_name))
     except:
-      import time
-      time.sleep(60)
-      code_obj = g.search_code('{}+repo:openstack/tempest'.format(querry_name))
+        import time
+        time.sleep(90)
+        g = Github("levor23", "Passw0rd")
+        querry_name = tempest_path.rsplit('.',1)[1]
+        code_obj = g.search_code('{}+repo:openstack/tempest'.format(querry_name))
     return code_obj.get_page(0)[0].html_url
   
 def update_test_cases_in_polarion(path):

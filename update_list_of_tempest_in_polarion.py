@@ -117,7 +117,7 @@ def generate_testcase_xml_file(file_path, project_id, assignee, title, descripti
            title=title,
            description=description,
            automation_test_id=automation_test_id,
-           github_url=get_url_to_file_by_tempest_path(automation_test_id))
+           github_url="test"
     # write file
     with open('{file_path}/{name}.xml'.format(file_path=file_path, name=automation_test_id), mode="w+") as f:
         f.write(template)

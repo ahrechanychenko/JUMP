@@ -161,10 +161,6 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
     i=0
     for test in tempest_list:
         if test.split("[")[0] not in automation_test_id_dict:
-            i=i+1
-            if i % 30 == 0:
-              import time
-              time.sleep(65)
             generate_testcase_xml_file(file_path=path,
                                        project_id=PROJECT_ID,
                                        assignee=assignee,
@@ -178,8 +174,7 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
                 
 def get_url_to_file_by_tempest_path(tempest_path):
     from github import Github
-    g = Github("levor23", "Passw0rd")
-    querry_name = tempest_path.rsplit('.',1)[1]
+    g = Github("levor23", "Passw0rd", client_id='56c58e572c4c610eb74d', client_secret='115765898b4af1be220a550ac32e2de336840f7a')    querry_name = tempest_path.rsplit('.',1)[1]
     code_obj = g.search_code('{}+repo:openstack/tempest'.format(querry_name))
     return code_obj.get_page(0)[0].html_url
   

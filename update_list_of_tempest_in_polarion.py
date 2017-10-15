@@ -172,8 +172,6 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
 
                 
 def get_url_to_file_by_tempest_path(tempest_path):
-    import time
-    time.sleep(5)
     querry_name = tempest_path.rsplit('.',1)[1]
     requests.packages.urllib3.disable_warnings()
     r = requests.get('https://api.github.com/search/code?q={}+repo:openstack/tempest'.format(querry_name), verify=False)

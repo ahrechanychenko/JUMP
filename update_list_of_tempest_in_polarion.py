@@ -175,7 +175,12 @@ def get_url_to_file_by_tempest_path(tempest_path):
     from github import Github
     g = Github("levor23", "Passw0rd")
     querry_name = tempest_path.rsplit('.',1)[1]
-    code_obj = g.search_code('{}+repo:openstack/tempest'.format(querry_name))
+    try:
+      code_obj = g.search_code('{}+repo:openstack/tempest'.format(querry_name))
+    except:
+      import time
+      time.sleep(60)
+      code_obj = g.search_code('{}+repo:openstack/tempest'.format(querry_name))
     return code_obj.get_page(0)[0].html_url
   
 def update_test_cases_in_polarion(path):

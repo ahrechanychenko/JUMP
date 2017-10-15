@@ -175,11 +175,11 @@ def get_url_to_file_by_tempest_path(tempest_path):
     querry_name = tempest_path.rsplit('.',1)[1]
     requests.packages.urllib3.disable_warnings()
     r = requests.get('https://api.github.com/search/code?q={}+repo:openstack/tempest'.format(querry_name), verify=False
-    try:
-        return json.loads(r.content)['items'][0]['html_url']
-    except:
-        import pprint
-        pprint.pprint(r.content)
+    import pprint
+    pprint.pprint(r.content)
+    return json.loads(r.content)['items'][0]['html_url']
+
+        
 
   
 def update_test_cases_in_polarion(path):

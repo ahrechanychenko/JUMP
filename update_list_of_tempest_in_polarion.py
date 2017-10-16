@@ -160,6 +160,8 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
     pprint.pprint(automation_test_id_dict)
     for test in tempest_list:
         if test.split("[")[0] not in automation_test_id_dict:
+            from github import Github
+            g = Github("levor23", "Passw0rd", client_id='56c58e572c4c610eb74d', client_secret='115765898b4af1be220a550ac32e2de336840f7a') 
             current_limit = g.get_rate_limit().raw_data['resources']['search']['remaining']
             print "limit is {} ".format(g.get_rate_limit().raw_data['resources']['search'])
             if current_limit < 2:

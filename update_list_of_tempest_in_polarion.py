@@ -8,6 +8,7 @@ import subprocess
 import logging
 import requests
 import json
+from ssl import SSLError
 
 logging.getLogger('suds.client').setLevel(logging.CRITICAL)
 
@@ -182,11 +183,11 @@ def get_url_to_file_by_tempest_path(tempest_path):
     from github import Github
     g = Github("levor23", "Passw0rd", client_id='56c58e572c4c610eb74d', client_secret='115765898b4af1be220a550ac32e2de336840f7a')    
     querry_name = tempest_path.rsplit('.',1)[1]
-    for i in range(0,50):
+    for i in range(0,100):
         try:
             code_obj = g.search_code('{}+repo:openstack/tempest'.format(querry_name))
             break
-        except:
+        except SSLError:
             continue
     return code_obj.get_page(0)[0].html_url
   

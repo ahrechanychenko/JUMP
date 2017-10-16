@@ -185,6 +185,7 @@ def get_url_to_file_by_tempest_path(tempest_path):
     for i in range(0,50):
         try:
             code_obj = g.search_code('{}+repo:openstack/tempest'.format(querry_name))
+            break
         except:
             continue
     return code_obj.get_page(0)[0].html_url

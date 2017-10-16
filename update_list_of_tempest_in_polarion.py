@@ -161,7 +161,7 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
     for test in tempest_list:
         if test.split("[")[0] not in automation_test_id_dict:
             current_limit = g.get_rate_limit().raw_data['resources']['search']['remaining']
-            if current_limit < = 2:
+            if current_limit < 2:
                 import time
                 time.sleep(65)
             generate_testcase_xml_file(file_path=path,

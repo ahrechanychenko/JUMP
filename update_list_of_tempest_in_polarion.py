@@ -117,7 +117,7 @@ def generate_testcase_xml_file(file_path, project_id, assignee, title, descripti
            title=title,
            description=description,
            automation_test_id=automation_test_id,
-           github_url="test")
+           github_url=get_url_to_file_by_tempest_path(automation_test_id)))
     # write file
     with open('{file_path}/{name}.xml'.format(file_path=file_path, name=automation_test_id), mode="w+") as f:
         f.write(template)
@@ -161,6 +161,10 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
     i=0
     for test in tempest_list:
         if test.split("[")[0] not in automation_test_id_dict:
+            i=i+1
+            if i % 29 == 0:
+                import time
+                time.sleep(70)
             generate_testcase_xml_file(file_path=path,
                                        project_id=PROJECT_ID,
                                        assignee=assignee,

@@ -225,4 +225,4 @@ if __name__ == "__main__":
         print "\n dry-run completed, xml files was generate"
         exit(0)
     else:
-update_test_cases_in_polarion(path='/tmp/test_tempest_updater')
+        update_test_cases_in_polarion(path='/tmp/test_tempest_updater')

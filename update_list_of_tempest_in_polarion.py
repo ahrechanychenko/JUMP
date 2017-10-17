@@ -1,15 +1,20 @@
 #!/usr/bin/python
 
 import os
-from pylarion import work_item
 import sys
 import argparse
 import subprocess
 import logging
 import requests
 import json
+import time
+import pprint
 from ssl import SSLError
 from functools import wraps
+from github import Github
+from pylarion import work_item
+
+
 
 
 logging.getLogger('suds.client').setLevel(logging.CRITICAL)
@@ -165,14 +170,12 @@ def get_polarion_tempest_test_cases():
 
 def check_tempest_test_in_polarion(tempest_list, assignee, path):
     automation_test_id_dict = get_polarion_tempest_test_cases()
-    import pprint
     pprint.pprint(automation_test_id_dict)
     pprint.pprint(tempest_list)
    
     for test in tempest_list:
         print "check test {}".format(test)
         if test.split("[")[0] not in automation_test_id_dict:
-            from github import Github
             g = Github("levor23", "Passw0rd", client_id='56c58e572c4c610eb74d', client_secret='115765898b4af1be220a550ac32e2de336840f7a') 
             for i in range(0,20):
                 try:
@@ -185,7 +188,6 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
                     continue
             print "limit is {} ".format(limit)
             if current_limit < 2:
-                import time
                 time.sleep(65)
             print "{} doesn't exist in Polarion, generate xml for it".format(test.split("[")[0])
             generate_testcase_xml_file(file_path=path,
@@ -199,7 +201,6 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
 
 @retry(times=50)               
 def get_url_to_file_by_tempest_path(tempest_path):
-    from github import Github
     g = Github("levor23", "Passw0rd", client_id='56c58e572c4c610eb74d', client_secret='115765898b4af1be220a550ac32e2de336840f7a')    
     querry_name = tempest_path.rsplit('.',1)[1]
     code_obj = g.search_code('{}+repo:openstack/tempest'.format(querry_name))

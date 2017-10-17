@@ -9,6 +9,8 @@ import logging
 import requests
 import json
 from ssl import SSLError
+from functools import wraps
+
 
 logging.getLogger('suds.client').setLevel(logging.CRITICAL)
 
@@ -44,6 +46,21 @@ POLARION_USER = args.polarion_user
 POLARION_PASS = args.polarion_user
 DRY_RUN = args.dry_run
 
+
+def retry(times):
+    def decor(func):
+        @wraps(func)
+        def repeat(*arg, **kwarg):
+            for i in range(times):
+                try:
+                    return func(*arg, **kwarg)
+                except SSLError:
+                    continue
+                except:
+                    continue
+            raise
+        return repeat
+    return decor
 
 
 def get_tempest_test_list():
@@ -126,7 +143,7 @@ def generate_testcase_xml_file(file_path, project_id, assignee, title, descripti
         f.write(template)
     os.path.isfile("{}/{name}.xml".format(file_path,name=automation_test_id))
 
-
+@retry(times=50)
 def get_polarion_tempest_test_cases():
     """ 
         Get all tempest test from polarion
@@ -139,21 +156,10 @@ def get_polarion_tempest_test_cases():
             dict: {automation-test-id:test_case_id}
 
         """
-    for i in range(0,50):
-        try:
-            test_cases = work_item.TestCase.query(query="automation-test-id:{}".format('tempest.*'), project_id='RHELOpenStackPlatform')
-            break
-        except:
-            continue
+    test_cases = work_item.TestCase.query(query="automation-test-id:{}".format('tempest.*'), project_id='RHELOpenStackPlatform')
     automation_test_id_dict = {}
     for test in test_cases:
-        for i in range(0,50):
-            try:
-                automation_test_id_dict[test.get_custom_field('automation-test-id').value.encode()] = test.work_item_id
-                break
-            except:
-                continue
-               
+        automation_test_id_dict[test.get_custom_field('automation-test-id').value.encode()] = test.work_item_id           
     return automation_test_id_dict
 
 
@@ -175,6 +181,8 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
                     break
                 except SSLError:
                     continue
+                except:
+                    continue
             print "limit is {} ".format(limit)
             if current_limit < 2:
                 import time
@@ -189,18 +197,14 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
         else:
             print "\n tempest test {} exist in Polarion {} project and covered by {}".format(test.split("[")[0], PROJECT_ID, automation_test_id_dict[test.split("[")[0]])
 
-                
+@retry(times=50)               
 def get_url_to_file_by_tempest_path(tempest_path):
     from github import Github
     g = Github("levor23", "Passw0rd", client_id='56c58e572c4c610eb74d', client_secret='115765898b4af1be220a550ac32e2de336840f7a')    
     querry_name = tempest_path.rsplit('.',1)[1]
-    for i in range(0,100):
-        try:
-            code_obj = g.search_code('{}+repo:openstack/tempest'.format(querry_name))
-            break
-        except SSLError:
-            continue
+    code_obj = g.search_code('{}+repo:openstack/tempest'.format(querry_name))
     return code_obj.get_page(0)[0].html_url
+  
   
 def update_test_cases_in_polarion(path):
     """ 

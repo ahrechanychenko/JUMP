@@ -1,21 +1,14 @@
 #!/usr/bin/python
 
 import os
+from pylarion import work_item
 import sys
 import argparse
 import subprocess
 import logging
 import requests
 import json
-import time
-import pprint
 from ssl import SSLError
-from functools import wraps
-from github import Github
-from pylarion import work_item
-
-
-
 
 logging.getLogger('suds.client').setLevel(logging.CRITICAL)
 
@@ -52,21 +45,6 @@ POLARION_PASS = args.polarion_user
 DRY_RUN = args.dry_run
 
 
-def retry(times):
-    def decor(func):
-        @wraps(func)
-        def repeat(*arg, **kwarg):
-            for i in range(times):
-                try:
-                    return func(*arg, **kwarg)
-                except SSLError:
-                    continue
-                except:
-                    continue
-            raise
-        return repeat
-    return decor
-
 
 def get_tempest_test_list():
     print "\n Install tempest \n"
@@ -75,10 +53,8 @@ def get_tempest_test_list():
     2) install in in virtual 
     3) prepare tempest for work
     4) run 'tempest run -l' to get list of default test
-
     Returns:
         list with names of tempest test
-
     """
     # check if we already have tempest workspace
     process = subprocess.Popen("tempest workspace list", shell=True, stdout=subprocess.PIPE)
@@ -104,7 +80,6 @@ def get_tempest_test_list():
 def generate_testcase_xml_file(file_path, project_id, assignee, title, description, automation_test_id):
     """ 
     Generate xml for each missed test case which must exist in Polarion
-
     Args:
         file_path: str , path to storing xml file.
         project_id: str, Polarion project ID.
@@ -112,7 +87,6 @@ def generate_testcase_xml_file(file_path, project_id, assignee, title, descripti
         title: str, title of test case
         description: str, description of test case
         automation_test_id: str, automation-test-id for test case 
-
     """
 
     # generate content for writing to xml file
@@ -148,36 +122,48 @@ def generate_testcase_xml_file(file_path, project_id, assignee, title, descripti
         f.write(template)
     os.path.isfile("{}/{name}.xml".format(file_path,name=automation_test_id))
 
-@retry(times=50)
+
 def get_polarion_tempest_test_cases():
     """ 
         Get all tempest test from polarion
         1) Connect to Polarion and get test_cases object via querry
         2) return dicit  {automation-test-id:test_case_id}
-
-
-
         Returns:
             dict: {automation-test-id:test_case_id}
-
         """
-    test_cases = work_item.TestCase.query(query="automation-test-id:{}".format('tempest.*'), project_id='RHELOpenStackPlatform')
+    for i in range(0,50):
+        try:
+            test_cases = work_item.TestCase.query(query="automation-test-id:{}".format('tempest.*'), project_id='RHELOpenStackPlatform')
+            break
+        except SSLError:
+            continue
+        except:
+            continue
     automation_test_id_dict = {}
     for test in test_cases:
-        automation_test_id_dict[test.get_custom_field('automation-test-id').value.encode()] = test.work_item_id           
+        for i in range(0,50):
+            try:
+                automation_test_id_dict[test.get_custom_field('automation-test-id').value.encode()] = test.work_item_id
+                break
+            except SSLError:
+                continue
+            except:
+                continue
+               
     return automation_test_id_dict
 
 
 def check_tempest_test_in_polarion(tempest_list, assignee, path):
     automation_test_id_dict = get_polarion_tempest_test_cases()
+    import pprint
     pprint.pprint(automation_test_id_dict)
     pprint.pprint(tempest_list)
    
     for test in tempest_list:
         print "check test {}".format(test)
         if test.split("[")[0] not in automation_test_id_dict:
+            from github import Github
             g = Github("levor23", "Passw0rd", client_id='56c58e572c4c610eb74d', client_secret='115765898b4af1be220a550ac32e2de336840f7a') 
-<<<<<<< HEAD
             for i in range(0,20):
                 try:
                     limit = g.get_rate_limit().raw_data['resources']['search']
@@ -188,11 +174,8 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
                 except:
                     continue
             print "limit is {} ".format(limit)
-=======
-            current_limit = g.get_rate_limit().raw_data['resources']['search']['remaining']
-            print "limit is {} ".format(g.get_rate_limit().raw_data['resources']['search'])
->>>>>>> parent of 22f238c... Update update_list_of_tempest_in_polarion.py
             if current_limit < 2:
+                import time
                 time.sleep(65)
             print "{} doesn't exist in Polarion, generate xml for it".format(test.split("[")[0])
             generate_testcase_xml_file(file_path=path,
@@ -204,19 +187,24 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
         else:
             print "\n tempest test {} exist in Polarion {} project and covered by {}".format(test.split("[")[0], PROJECT_ID, automation_test_id_dict[test.split("[")[0]])
 
-@retry(times=50)               
+                
 def get_url_to_file_by_tempest_path(tempest_path):
+    from github import Github
     g = Github("levor23", "Passw0rd", client_id='56c58e572c4c610eb74d', client_secret='115765898b4af1be220a550ac32e2de336840f7a')    
     querry_name = tempest_path.rsplit('.',1)[1]
-    code_obj = g.search_code('{}+repo:openstack/tempest'.format(querry_name))
+    for i in range(0,100):
+        try:
+            code_obj = g.search_code('{}+repo:openstack/tempest'.format(querry_name))
+            break
+        except SSLError:
+            continue
+        except:
+            continue
     return code_obj.get_page(0)[0].html_url
-  
   
 def update_test_cases_in_polarion(path):
     """ 
         Upload test cases which covering missed tempest tests via curl to stage job 
-
-
     """
     list_of_xml = [f for f in os.listdir(path) if
                    os.path.isfile(os.path.join(path, f))]
@@ -237,5 +225,4 @@ if __name__ == "__main__":
         print "\n dry-run completed, xml files was generate"
         exit(0)
     else:
-        update_test_cases_in_polarion(path='/tmp/test_tempest_updater')
-
+update_test_cases_in_polarion(path='/tmp/test_tempest_updater')

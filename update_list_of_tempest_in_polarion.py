@@ -168,13 +168,13 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
             if current_limit < 2:
                 import time
                 time.sleep(65)
+            print "{} doesn't exist in Polarion, generate xml for it".format(test.split("[")[0])
             generate_testcase_xml_file(file_path=path,
                                        project_id=PROJECT_ID,
                                        assignee=assignee,
                                        title="tempest test which covers {}".format(test.split("[")[0]),
                                        description="",
                                        automation_test_id=test.split("[")[0])
-            print "{} doesn't exist in Polarion, generate xml for it".format(test.split("[")[0])
         else:
             print "\n tempest test {} exist in Polarion {} project and covered by {}".format(test.split("[")[0], PROJECT_ID, automation_test_id_dict[test.split("[")[0]])
 

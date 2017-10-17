@@ -105,9 +105,6 @@ def generate_testcase_xml_file(file_path, project_id, assignee, title, descripti
       <custom-field content="positive" id="caseposneg"/>
       <custom-field content="yes" id="upstream"/>
       <custom-field content="functional" id="testtype"/>
-      <custom-field content="setup" id="setup"/>
-      <custom-field content="teardown by cleaning the workspace." id="teardown"/>
-      <custom-field content="{github_url}" id="automation_script"/>
     </custom-fields>
   </testcase>
 </testcases>
@@ -162,22 +159,7 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
     for test in tempest_list:
         print "check test {}".format(test)
         if test.split("[")[0] not in automation_test_id_dict:
-            from github import Github
-            g = Github("levor23", "Passw0rd", client_id='56c58e572c4c610eb74d', client_secret='115765898b4af1be220a550ac32e2de336840f7a') 
-            for i in range(0,20):
-                try:
-                    limit = g.get_rate_limit().raw_data['resources']['search']
-                    current_limit = limit['remaining']
-                    break
-                except SSLError:
-                    continue
-                except:
-                    continue
-            print "limit is {} ".format(limit)
-            if current_limit < 2:
-                import time
-                time.sleep(65)
-            print "{} doesn't exist in Polarion, generate xml for it".format(test.split("[")[0])
+            print "\n {} doesn't exist in Polarion, generate xml for it".format(test.split("[")[0])
             generate_testcase_xml_file(file_path=path,
                                        project_id=PROJECT_ID,
                                        assignee=assignee,
@@ -187,20 +169,6 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
         else:
             print "\n tempest test {} exist in Polarion {} project and covered by {}".format(test.split("[")[0], PROJECT_ID, automation_test_id_dict[test.split("[")[0]])
 
-                
-def get_url_to_file_by_tempest_path(tempest_path):
-    from github import Github
-    g = Github("levor23", "Passw0rd", client_id='56c58e572c4c610eb74d', client_secret='115765898b4af1be220a550ac32e2de336840f7a')    
-    querry_name = tempest_path.rsplit('.',1)[1]
-    for i in range(0,100):
-        try:
-            code_obj = g.search_code('{}+repo:openstack/tempest'.format(querry_name))
-            break
-        except SSLError:
-            continue
-        except:
-            continue
-    return code_obj.get_page(0)[0].html_url
   
 def update_test_cases_in_polarion(path):
     """ 

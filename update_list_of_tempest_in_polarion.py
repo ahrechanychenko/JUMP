@@ -72,6 +72,8 @@ def get_tempest_test_list():
                                stdout=subprocess.PIPE)
     out, err = process.communicate()
     tempest_test = out.split('\n')
+    #remove empty values
+    tempest_test = filter(None, tempest_test)
 
     # return list of test
     return tempest_test[5:]

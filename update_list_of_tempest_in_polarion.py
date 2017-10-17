@@ -177,6 +177,7 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
         print "check test {}".format(test)
         if test.split("[")[0] not in automation_test_id_dict:
             g = Github("levor23", "Passw0rd", client_id='56c58e572c4c610eb74d', client_secret='115765898b4af1be220a550ac32e2de336840f7a') 
+<<<<<<< HEAD
             for i in range(0,20):
                 try:
                     limit = g.get_rate_limit().raw_data['resources']['search']
@@ -187,6 +188,10 @@ def check_tempest_test_in_polarion(tempest_list, assignee, path):
                 except:
                     continue
             print "limit is {} ".format(limit)
+=======
+            current_limit = g.get_rate_limit().raw_data['resources']['search']['remaining']
+            print "limit is {} ".format(g.get_rate_limit().raw_data['resources']['search'])
+>>>>>>> parent of 22f238c... Update update_list_of_tempest_in_polarion.py
             if current_limit < 2:
                 time.sleep(65)
             print "{} doesn't exist in Polarion, generate xml for it".format(test.split("[")[0])

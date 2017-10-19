@@ -99,7 +99,7 @@ def update_automation_env(test_cases):
             list_of_skipped_test.append(test.work_item_id)
         except:
             print "test {} wasn't update in due to Polarion problems".format(test.work_item_id)
-            list_of_skipped_test.appen(test.work_item_id)
+            list_of_skipped_test.append(test.work_item_id)
     print "\n Full list of skipped test due to Polarion connection issues"
     pprint.pprint(list_of_skipped_test)
         

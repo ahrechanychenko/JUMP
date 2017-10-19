@@ -86,7 +86,7 @@ def update_automation_env(test_cases):
     """
 
     for test in test_cases:
-        for i in range(0, 50):
+        for i in range(0,10):
             try:
                 if test.get_custom_field('automation-env').value is None:
                     print "test {} doesn't have automation-env".format(test.work_item_id)
@@ -99,12 +99,10 @@ def update_automation_env(test_cases):
                     print "test {} have automation-env:tempest".format(test.work_item_id)
                     update_automation_env(test, '001')
                     break
-
-                break
-            except SSLError:
-                continue
-            except:
-                continue
+             except SSLError:
+                 continue
+             except:
+                 continue
 
 
 if __name__ == "__main__":

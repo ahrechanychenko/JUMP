@@ -43,7 +43,7 @@ def get_test_case_objects():
     Connect to Polarion and get test cases where automation-test-id:tempest.*
     :return: list, pylarion Testcase objects 
     """
-    for i in range(0, 100):
+    for i in range(0,5):
         try:
             test_cases = work_item.TestCase.query(
                 query="automation-test-id:tempest.*",
@@ -58,24 +58,24 @@ def get_test_case_objects():
         test_cases
     except NameError:
         test_cases = None
-        print "Cannot connect to Polarion Server in 100 attemts"
+        print "Cannot connect to Polarion Server after four attempts"
         exit(1)
     return test_cases
 
 
 def update_automation_env(test_obj, code):
-    for i in range(0,100):
-        try:
-            if DRY_RUN:
-                pass
-            else:
+    if DRY_RUN:
+            pass
+    else:
+        for i in range(0,10):
+            try:
                 setattr(test_obj, "automation-env", code)
                 test_obj.update()
                 break
-        except SSLError:
-            continue
-        except:
-            continue
+            except SSLError:
+                continue
+            except:
+                continue
 
 
 def update_automation_env(test_cases):
@@ -86,7 +86,7 @@ def update_automation_env(test_cases):
     """
 
     for test in test_cases:
-        for i in range(0,100):
+        for i in range(0,10):
             try:
                 if test.get_custom_field('automation-env').value is None:
                     update_automation_env(test, '001')

@@ -99,10 +99,10 @@ def update_automation_env(test_cases):
                     print "test {} have automation-env:tempest".format(test.work_item_id)
                     update_automation_env(test, '001')
                     break
-             except SSLError:
-                 continue
-             except:
-                 continue
+            except SSLError:
+                continue
+            except:
+                continue
 
 
 if __name__ == "__main__":

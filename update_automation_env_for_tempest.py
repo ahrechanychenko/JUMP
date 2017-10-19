@@ -67,7 +67,7 @@ def update_automation_env(test_obj, code):
     if DRY_RUN:
             pass
     else:
-        for i in range(0,10):
+        for i in range(0,50):
             try:
                 setattr(test_obj, "automation-env", code)
                 test_obj.update()

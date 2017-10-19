@@ -43,7 +43,7 @@ def get_test_case_objects():
     Connect to Polarion and get test cases where automation-test-id:tempest.*
     :return: list, pylarion Testcase objects 
     """
-    for i in range(0, 500):
+    for i in range(0, 100):
         try:
             test_cases = work_item.TestCase.query(
                 query="automation-test-id:tempest.*",
@@ -64,7 +64,7 @@ def get_test_case_objects():
 
 
 def update_automation_env(test_obj, code):
-    for i in range(0,500):
+    for i in range(0,100):
         try:
             if DRY_RUN:
                 pass
@@ -86,7 +86,7 @@ def update_automation_env(test_cases):
     """
 
     for test in test_cases:
-        for i in range(0,500):
+        for i in range(0,100):
             try:
                 if test.get_custom_field('automation-env').value is None:
                     update_automation_env(test, '001')

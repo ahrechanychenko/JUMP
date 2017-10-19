@@ -6,6 +6,7 @@ import sys
 import argparse
 import logging
 from ssl import SSLError
+import pprint
 
 logging.getLogger('suds.client').setLevel(logging.CRITICAL)
 
@@ -67,46 +68,42 @@ def update_automation_env(test_obj, code):
     if DRY_RUN:
             pass
     else:
-        for i in range(0,50):
-            try:
-                setattr(test_obj, "automation-env", code)
-                test_obj.update()
-                break
-            except SSLError:
-                continue
-            except:
-                continue
+        try:
+            setattr(test_obj, "automation-env", code)
+            test_obj.update()
+        except SSLError:
+            print "cannot set attribute automation-env for test {} due to Polarion problems".format(test_obj.work_item_id)
+        except:
+            print "cannot set attribute automation-env for test {} due to Polarion problems".format(test_obj.work_item_id)
 
-
+             
 def update_automation_env(test_cases):
     """
     Check automation-env attribute in Testcase object and set to '001'-Tempest
     :param test_cases: list with Testcase objects
     :return: None
     """
-
+    list_of_skipped_test = []
     for test in test_cases:
-        for i in range(0,50):
-            try:
-                if test.get_custom_field('automation-env').value is None:
-                    update_automation_env(test, '001')
-                    print "test {} doesn't have automation-env".format(test.work_item_id)
-                    break
-                elif test.get_custom_field('automation-env').value.id.encode() != "001":
-                    update_automation_env(test, '001')
-                    print "test {} have automation-env:{} so change it to tempest- 001".format(test.work_item_id, test.get_custom_field('automation-env').value.id.encode())
-                    break
-                else:
-                    print "test {} have automation-env:tempest".format(test.work_item_id)
-                    break
-            except SSLError:
-                continue
-            except:
-                if i == 49:
-                    print "test {} wasn't update in 50 attempts due to Polarion problems".format(test.work_item_id)
-                continue
-
-
+        try:
+            if test.get_custom_field('automation-env').value is None:
+                update_automation_env(test, '001')
+                print "test {} doesn't have automation-env".format(test.work_item_id)
+                
+            elif test.get_custom_field('automation-env').value.id.encode() != "001":
+                update_automation_env(test, '001')
+                print "test {} have automation-env:{} so change it to tempest- 001".format(test.work_item_id, test.get_custom_field('automation-env').value.id.encode())
+            else:
+                print "test {} have automation-env:tempest".format(test.work_item_id)
+        except SSLError:
+            print "test {} wasn't update in due to Polarion problems".format(test.work_item_id)
+            list_of_skipped_test.attempt(test.work_item_id)
+        except:
+            print "test {} wasn't update in due to Polarion problems".format(test.work_item_id)
+            list_of_skipped_test.attempt(test.work_item_id)
+    print "\n Full list of skipped test due to Polarion connection issues"
+    pprint.pprint(list_of_skipped_test)
+        
 if __name__ == "__main__":
     ts = get_test_case_objects()
     print ts

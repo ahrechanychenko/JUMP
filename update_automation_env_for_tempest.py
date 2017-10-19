@@ -93,9 +93,7 @@ def update_automation_env(test_cases):
                     update_automation_env(test, '001')
                     break
                 elif test.get_custom_field('automation-env').value.id.encode() != "001":
-                    print "test {} have automation-env:{} so change it to tempest- 001".format(
-                        test.work_item_id, 
-                        test.get_custom_field('automation-env').value.id.encode())
+                    print "test {} have automation-env:{} so change it to tempest- 001".format(test.work_item_id, test.get_custom_field('automation-env').value.id.encode())
                     break
                 else:
                     print "test {} have automation-env:tempest".format(test.work_item_id)

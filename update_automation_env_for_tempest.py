@@ -7,6 +7,7 @@ import argparse
 import logging
 from ssl import SSLError
 import pprint
+import time
 
 logging.getLogger('suds.client').setLevel(logging.CRITICAL)
 
@@ -126,7 +127,8 @@ def update_automation_env(test_cases):
             print "test {} wasn't update in due to Polarion problems.Add to list of skipped test".format(test.work_item_id)
             list_of_skipped_test.append(test)
     print "\n Full list of skipped test due to Polarion connection issues"
-    pprint.pprint(list_of_skipped_test)
+    print len(list_of_skipped_test)
+    print "\n"b
     pprint.pprint(list_of_test_with_incorrect_automation_id)
     return list_of_test_with_incorrect_automation_id
 
@@ -150,8 +152,11 @@ def re_check_skipped_test(list_of_test_with_incorrect_automation_id):
                     list_of_skipped_test.pop(test)
             except SSLError:
                 print "test {} wasn't update in due to Polarion problems.".format(test.work_item_id)
+                time.sleep(5)
             except:
                 print "test {} wasn't update in due to Polarion problems".format(test.work_item_id)
+                time.sleep(5)
+
     return list_of_test_with_incorrect_automation_id
 
 

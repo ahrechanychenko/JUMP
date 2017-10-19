@@ -88,8 +88,7 @@ def update_automation_env(test_cases):
         try:
             if test.get_custom_field('automation-env').value is None:
                 update_automation_env(test, '001')
-                print "test {} doesn't have automation-env".format(test.work_item_id)
-                
+                print "test {} doesn't have automation-env".format(test.work_item_id)               
             elif test.get_custom_field('automation-env').value.id.encode() != "001":
                 update_automation_env(test, '001')
                 print "test {} have automation-env:{} so change it to tempest- 001".format(test.work_item_id, test.get_custom_field('automation-env').value.id.encode())
@@ -97,10 +96,10 @@ def update_automation_env(test_cases):
                 print "test {} have automation-env:tempest".format(test.work_item_id)
         except SSLError:
             print "test {} wasn't update in due to Polarion problems".format(test.work_item_id)
-            list_of_skipped_test.attempt(test.work_item_id)
+            list_of_skipped_test.append(test.work_item_id)
         except:
             print "test {} wasn't update in due to Polarion problems".format(test.work_item_id)
-            list_of_skipped_test.attempt(test.work_item_id)
+            list_of_skipped_test.appen(test.work_item_id)
     print "\n Full list of skipped test due to Polarion connection issues"
     pprint.pprint(list_of_skipped_test)
         

@@ -89,11 +89,11 @@ def update_automation_env(test_cases):
         for i in range(0,100):
             try:
                 if test.get_custom_field('automation-env').value is None:
-                    #update_automation_env(test, '001')
+                    update_automation_env(test, '001')
                     print "test {} doesn't have automation-env".format(test.work_item_id)
                     break
                 elif test.get_custom_field('automation-env').value.id.encode() != "001":
-                    #update_automation_env(test, '001')
+                    update_automation_env(test, '001')
                     print "test {} have automation-env:{} so change it to tempest- 001".format(test.work_item_id, test.get_custom_field('automation-env').value.id.encode())
                     break
                 else:
@@ -107,4 +107,4 @@ def update_automation_env(test_cases):
 
 if __name__ == "__main__":
     ts = get_test_case_objects()
-update_automation_env(ts)
+    update_automation_env(ts)

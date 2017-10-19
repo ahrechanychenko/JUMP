@@ -64,18 +64,18 @@ def get_test_case_objects():
 
 
 def update_automation_env(test_obj, code):
-    try:
-        if DRY_RUN:
-            pass
-        else:
-            setattr(test_obj, "automation-env", code)
-            test_obj.update()
-    except SSLError:
-        print "Cannot update due to connection problems"
-        raise
-    except:
-        print "Cannot update due to connection problems"
-        raise 
+    for i in range(0,50):
+        try:
+            if DRY_RUN:
+                pass
+            else:
+                setattr(test_obj, "automation-env", code)
+                test_obj.update()
+                break
+        except SSLError:
+            continue
+        except:
+            continue
 
 
 def update_automation_env(test_cases):
@@ -86,22 +86,25 @@ def update_automation_env(test_cases):
     """
 
     for test in test_cases:
-        try:
-            if test.get_custom_field('automation-env').value is None:
-                print "test {} doesn't have automation-env".format(test.work_item_id)
-                update_automation_env(test, '001')
-            elif test.get_custom_field('automation-env').value.id.encode() != "001":
-                print "test {} have automation-env:{} so change it to tempest- 001".format(
-                    test.work_item_id, test.get_custom_field('automation-env').value.id.encode())
-                update_automation_env(test, '001')
-            else:
-                print "test {} have automation-env:tempest".format(test.work_item_id)
-        except SSLError:
-            continue
-        except:
-            continue
+        for i in range(0,10):
+            try:
+                if test.get_custom_field('automation-env').value is None:
+                    update_automation_env(test, '001')
+                    print "test {} doesn't have automation-env".format(test.work_item_id)
+                    break
+                elif test.get_custom_field('automation-env').value.id.encode() != "001":
+                    update_automation_env(test, '001')
+                    print "test {} have automation-env:{} so change it to tempest- 001".format(test.work_item_id, test.get_custom_field('automation-env').value.id.encode())
+                    break
+                else:
+                    print "test {} have automation-env:tempest".format(test.work_item_id)
+                    break
+            except SSLError:
+                continue
+            except:
+                continue
 
 
 if __name__ == "__main__":
     ts = get_test_case_objects()
-    update_automation_env(ts)
+update_automation_env(ts)

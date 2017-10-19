@@ -130,7 +130,7 @@ def update_automation_env(test_cases):
     pprint.pprint(list_of_test_with_incorrect_automation_id)
     return list_of_test_with_incorrect_automation_id
 
-def re_check_skipped_test(wrong_automation):
+def re_check_skipped_test(list_of_test_with_incorrect_automation_id):
     global list_of_skipped_test
     while len(list_of_skipped_test)!=0:
         for test in list_of_skipped_test:
@@ -149,7 +149,7 @@ def re_check_skipped_test(wrong_automation):
                     print "test {} have automation-env:tempest".format(test.work_item_id)
                     list_of_skipped_test.pop(test)
             except SSLError:
-                print "test {} wasn't update in due to Polarion problems".format(test.work_item_id)
+                print "test {} wasn't update in due to Polarion problems.".format(test.work_item_id)
             except:
                 print "test {} wasn't update in due to Polarion problems".format(test.work_item_id)
     return list_of_test_with_incorrect_automation_id

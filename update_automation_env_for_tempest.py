@@ -89,16 +89,16 @@ def update_automation_env(test_cases):
         for i in range(0, 50):
             try:
                 if test.get_custom_field('automation-env').value is None:
-                    print "test {} doesn't have automation-env:tempest".format(test.work_item_id)
+                    print "test {} doesn't have automation-env".format(test.work_item_id)
                     update_automation_env(test, '001')
                     break
                 elif test.get_custom_field('automation-env').value.id.encode() != "001":
-                    print "test {} doesn't have automation-env:tempest".format(
+                    print "test {} have automation-env:{} so change it to tempest- 001".format(
+                        test.work_item_id, 
                         test.get_custom_field('automation-env').value.id.encode())
                     break
                 else:
-                    print "test {} have automation-env:tempest".format(
-                        test.get_custom_field('automation-env').value.id.encode())
+                    print "test {} have automation-env:tempest".format(test.work_item_id)
                     update_automation_env(test, '001')
                     break
 

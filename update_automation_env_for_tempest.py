@@ -128,7 +128,7 @@ def update_automation_env(test_cases):
             list_of_skipped_test.append(test)
     print "\n Full list of skipped test due to Polarion connection issues"
     print len(list_of_skipped_test)
-    print "\n"b
+    print "\n"
     pprint.pprint(list_of_test_with_incorrect_automation_id)
     return list_of_test_with_incorrect_automation_id
 

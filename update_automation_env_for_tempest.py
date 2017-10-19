@@ -43,7 +43,7 @@ def get_test_case_objects():
     Connect to Polarion and get test cases where automation-test-id:tempest.*
     :return: list, pylarion Testcase objects 
     """
-    for i in range(0, 50):
+    for i in range(0, 100):
         try:
             test_cases = work_item.TestCase.query(
                 query="automation-test-id:tempest.*",
@@ -58,13 +58,13 @@ def get_test_case_objects():
         test_cases
     except NameError:
         test_cases = None
-        print "Cannot connect to Polarion Server in 50 attemts"
+        print "Cannot connect to Polarion Server in 100 attemts"
         exit(1)
     return test_cases
 
 
 def update_automation_env(test_obj, code):
-    for i in range(0,50):
+    for i in range(0,100):
         try:
             if DRY_RUN:
                 pass

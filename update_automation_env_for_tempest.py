@@ -107,4 +107,5 @@ def update_automation_env(test_cases):
 
 if __name__ == "__main__":
     ts = get_test_case_objects()
+    print ts
     update_automation_env(ts)

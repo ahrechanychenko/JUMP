@@ -42,7 +42,7 @@ DRY_RUN = args.dry_run
 def get_test_case_objects():
     """
     Connect to Polarion and get test cases where automation-test-id:tempest.*
-    :return: list, pylarion Testcase objects 
+    :return: list, pylarion Testcase objects
     """
     for i in range(0,10):
         try:
@@ -76,7 +76,7 @@ def update_automation_env(test_obj, code):
         except:
             print "cannot set attribute automation-env for test {} due to Polarion problems".format(test_obj.work_item_id)
 
-             
+
 def update_automation_env(test_cases):
     """
     Check automation-env attribute in Testcase object and set to '001'-Tempest
@@ -88,7 +88,7 @@ def update_automation_env(test_cases):
         try:
             if test.get_custom_field('automation-env').value is None:
                 update_automation_env(test, '001')
-                print "test {} doesn't have automation-env".format(test.work_item_id)               
+                print "test {} doesn't have automation-env".format(test.work_item_id)
             elif test.get_custom_field('automation-env').value.id.encode() != "001":
                 update_automation_env(test, '001')
                 print "test {} have automation-env:{} so change it to tempest- 001".format(test.work_item_id, test.get_custom_field('automation-env').value.id.encode())
@@ -102,8 +102,7 @@ def update_automation_env(test_cases):
             list_of_skipped_test.append(test.work_item_id)
     print "\n Full list of skipped test due to Polarion connection issues"
     pprint.pprint(list_of_skipped_test)
-        
+
 if __name__ == "__main__":
     ts = get_test_case_objects()
-    print ts
     update_automation_env(ts)

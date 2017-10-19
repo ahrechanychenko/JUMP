@@ -86,7 +86,7 @@ def update_automation_env(test_cases):
     """
 
     for test in test_cases:
-        for i in range(0,10):
+        for i in range(0,50):
             try:
                 if test.get_custom_field('automation-env').value is None:
                     update_automation_env(test, '001')

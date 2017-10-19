@@ -43,7 +43,7 @@ def get_test_case_objects():
     Connect to Polarion and get test cases where automation-test-id:tempest.*
     :return: list, pylarion Testcase objects 
     """
-    for i in range(0,5):
+    for i in range(0,10):
         try:
             test_cases = work_item.TestCase.query(
                 query="automation-test-id:tempest.*",
@@ -58,7 +58,7 @@ def get_test_case_objects():
         test_cases
     except NameError:
         test_cases = None
-        print "Cannot connect to Polarion Server after four attempts"
+        print "Cannot connect to Polarion Server after ten attempts"
         exit(1)
     return test_cases
 

@@ -103,7 +103,7 @@ def update_automation_env(test_cases):
                 continue
             except:
                 if i == 49:
-                    print "test {} wasn't update in 50 attempts due to Polarion problems".format(test.work_item_id)"
+                    print "test {} wasn't update in 50 attempts due to Polarion problems".format(test.work_item_id)
                 continue
 
 

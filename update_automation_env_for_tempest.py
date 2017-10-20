@@ -41,7 +41,8 @@ DRY_RUN = args.dry_run
 
 list_of_skipped_test = []
 
-def get_test_case_objects():
+
+def get_test_case_with_incorrect_env():
     """
     Connect to Polarion and get test cases where automation-test-id:tempest.*
     :return: list, pylarion Testcase objects
@@ -49,7 +50,7 @@ def get_test_case_objects():
     for i in range(0,10):
         try:
             test_cases = work_item.TestCase.query(
-                query="automation-test-id:tempest.*",
+                query="automation-test-id:tempest.* AND NOT automation-env:001",
                 project_id=PROJECT_ID)
             break
         except SSLError:
@@ -89,11 +90,14 @@ def get_test_case_objects_with_correct_automation_id():
         exit(1)
     return test_cases
 
+
 def update_automation_env(test_obj, code):
     if DRY_RUN:
             pass
     else:
         try:
+            import pdb
+            pdb.set_trace()
             setattr(test_obj, "automation-env", code)
             test_obj.update()
         except SSLError:
@@ -102,67 +106,26 @@ def update_automation_env(test_obj, code):
             print "cannot set attribute automation-env for test {} due to Polarion problems".format(test_obj.work_item_id)
 
 
-def update_automation_env(test_cases):
+def update_test_with_wrong_automation_id(test_cases):
     """
-    Check automation-env attribute in Testcase object and set to '001'-Tempest
+    Update automation-env attribute in Testcase object and set to '001'-Tempest
     :param test_cases: list with Testcase objects
     :return: None
     """
-    global list_of_skipped_test
-    list_of_test_with_incorrect_automation_id = []
+    updated = 0
     for test in test_cases:
         try:
-            if test.get_custom_field('automation-env').value is None:
-                list_of_test_with_incorrect_automation_id.append(test)
-                print "test {} doesn't have automation-env".format(test.work_item_id)
-            elif test.get_custom_field('automation-env').value.id.encode() != "001":
-                list_of_test_with_incorrect_automation_id.append(test)
-                print "test {} have automation-env:{} so change it to tempest- 001".format(test.work_item_id, test.get_custom_field('automation-env').value.id.encode())
-            else:
-                print "test {} have automation-env:tempest".format(test.work_item_id)
+            update_automation_env(test, '001')
+            print "test {} was update to automation-env:001".format(test.work_item_id)
+            updated +=1
         except SSLError:
-            print "test {} wasn't update in due to Polarion problems.Add to list of skipped test".format(test.work_item_id)
-            list_of_skipped_test.append(test)
+            print "test {} wasn't update in due to Polarion problems.Skip it".format(test.work_item_id)
         except:
-            print "test {} wasn't update in due to Polarion problems.Add to list of skipped test".format(test.work_item_id)
-            list_of_skipped_test.append(test)
-    print "\n Full list of skipped test due to Polarion connection issues"
-    print len(list_of_skipped_test)
-    print "\n"
-    pprint.pprint(list_of_test_with_incorrect_automation_id)
-    return list_of_test_with_incorrect_automation_id
-
-def re_check_skipped_test(list_of_test_with_incorrect_automation_id):
-    global list_of_skipped_test
-    while len(list_of_skipped_test)!=0:
-        for test in list_of_skipped_test:
-            try:
-                if test.get_custom_field('automation-env').value is None:
-                    list_of_test_with_incorrect_automation_id.append(test)
-                    list_of_skipped_test.pop(test)
-                    print "test {} doesn't have automation-env".format(test.work_item_id)
-                elif test.get_custom_field('automation-env').value.id.encode() != "001":
-                    list_of_test_with_incorrect_automation_id.append(test)
-                    list_of_skipped_test.pop(test)
-                    print "test {} have automation-env:{} so change it to tempest- 001".format(test.work_item_id,
-                                                                                               test.get_custom_field(
-                                                                                                   'automation-env').value.id.encode())
-                else:
-                    print "test {} have automation-env:tempest".format(test.work_item_id)
-                    list_of_skipped_test.pop(test)
-            except SSLError:
-                print "test {} wasn't update in due to Polarion problems.".format(test.work_item_id)
-                time.sleep(5)
-            except:
-                print "test {} wasn't update in due to Polarion problems".format(test.work_item_id)
-                time.sleep(5)
-
-    return list_of_test_with_incorrect_automation_id
+            print "test {} wasn't update in due to Polarion problems.Skip it".format(test.work_item_id)
+    print "{} tests was update".format(str(updated))
 
 
 if __name__ == "__main__":
-    ts = get_test_case_objects()
-    correct_ts = get_test_case_objects_with_correct_automation_id()
-    wrong_automation = update_automation_env(ts)
-    wrong_automation_finally = re_check_skipped_test(wrong_automation)
-    print len(ts), len(correct_ts), len(wrong_automation_finally)
+    ts = get_test_case_with_incorrect_env()
+    update_test_with_wrong_automation_id(ts)
+

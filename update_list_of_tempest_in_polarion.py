@@ -189,7 +189,7 @@ def check_tempest_test_in_polarion(tempest_lst, path):
     by default - '/tmp/test_tempest_updater'
     """
     automation_test_id_dict = get_polarion_tempest_test_cases()
-    print (automation_test_id_dict)
+    print len(automation_test_id_dict)
     pprint.pprint(automation_test_id_dict)
     pprint.pprint(tempest_lst)
 

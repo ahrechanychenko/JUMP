@@ -96,8 +96,6 @@ def update_automation_env(test_obj, code):
             pass
     else:
         try:
-            import pdb
-            pdb.set_trace()
             setattr(test_obj, "automation-env", code)
             test_obj.update()
         except SSLError:

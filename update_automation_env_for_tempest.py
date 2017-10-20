@@ -113,7 +113,7 @@ def update_test_with_wrong_automation_id(test_cases):
     """
     for test in test_cases:
         try:
-            update_automation_env(test, '001',updated)
+            update_automation_env(test, '001')
         except SSLError:
             print "test {} wasn't update in due to Polarion problems.Skip it".format(test.work_item_id)
         except:

@@ -98,6 +98,8 @@ def update_automation_env(test_obj, code):
         try:
             setattr(test_obj, "automation-env", code)
             test_obj.update()
+            global updated
+            updated+=1
             print "test {} was update to automation-env:001".format(test_obj.work_item_id)
         except SSLError:
             print "cannot set attribute automation-env for test {} due to Polarion problems".format(test_obj.work_item_id)
@@ -115,8 +117,6 @@ def update_test_with_wrong_automation_id(test_cases):
     for test in test_cases:
         try:
             update_automation_env(test, '001')
-
-            updated +=1
         except SSLError:
             print "test {} wasn't update in due to Polarion problems.Skip it".format(test.work_item_id)
         except:

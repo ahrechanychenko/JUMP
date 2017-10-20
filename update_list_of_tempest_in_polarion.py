@@ -150,7 +150,7 @@ def get_polarion_tempest_test_cases():
     for i in range(0, 50):
         try:
             test_cases = work_item.TestCase.query(
-                query="automation-test-id:tempest.*",
+                query="automation-test-id:tempest.* AND automation-env:001",
                 project_id='RHELOpenStackPlatform')
             break
         except SSLError:

@@ -91,14 +91,13 @@ def get_test_case_objects_with_correct_automation_id():
     return test_cases
 
 
-def update_automation_env(test_obj, code, updated_counter):
+def update_automation_env(test_obj, code):
     if DRY_RUN:
             pass
     else:
         try:
             setattr(test_obj, "automation-env", code)
             test_obj.update()
-            updated_counter+=1
             print "test {} was update to automation-env:001".format(test_obj.work_item_id)
         except SSLError:
             print "cannot set attribute automation-env for test {} due to Polarion problems".format(test_obj.work_item_id)
@@ -112,7 +111,6 @@ def update_test_with_wrong_automation_id(test_cases):
     :param test_cases: list with Testcase objects
     :return: None
     """
-    updated = 0
     for test in test_cases:
         try:
             update_automation_env(test, '001',updated)
@@ -120,8 +118,6 @@ def update_test_with_wrong_automation_id(test_cases):
             print "test {} wasn't update in due to Polarion problems.Skip it".format(test.work_item_id)
         except:
             print "test {} wasn't update in due to Polarion problems.Skip it".format(test.work_item_id)
-    print "{} tests was update".format(str(updated))
-
 
 if __name__ == "__main__":
     ts = get_test_case_with_incorrect_env()

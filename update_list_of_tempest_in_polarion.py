@@ -190,6 +190,7 @@ def check_tempest_test_in_polarion(tempest_lst, path):
     """
     automation_test_id_dict = get_polarion_tempest_test_cases()
     print len(automation_test_id_dict)
+    print len(list(set(automation_test_id_dict.keys())))
     pprint.pprint(automation_test_id_dict)
     pprint.pprint(tempest_lst)
 

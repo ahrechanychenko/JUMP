@@ -179,6 +179,26 @@ def get_polarion_tempest_test_cases():
                     print "Test {} was skipped".format(test.work_item_id)
                 continue
     
+    #due to unstable polarion check if we have some skipped test
+    for test in test_cases:
+        if test.work_item_id not in automation_test_id_dict.values():
+            print "test {} was skip. Update dict".format(test.work_item_id)
+            for i in range(0, 10):
+                try:
+                    automation_test_id_dict[test.get_custom_field(
+                        'automation-test-id').value.encode()] = test.work_item_id
+                    break
+                except SSLError:
+                    print "Test {} was skipped. Retry".format(test.work_item_id)
+                    if i == 9:
+                        print "Test {} was skipped. Cannot connect to polarion after 10 attempts".format(test.work_item_id)
+                    continue
+                except:
+                    print "Test {} was skipped. Retry".format(test.work_item_id)
+                    if i == 9:
+                        print "Test {} was skipped. Cannot connect to polarion after 10 attempts".format(test.work_item_id)
+                    continue
+
     return automation_test_id_dict
 
 

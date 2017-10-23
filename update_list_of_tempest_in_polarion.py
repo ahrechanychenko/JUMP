@@ -177,10 +177,10 @@ def get_polarion_tempest_test_cases():
             except:
                 continue
     
-    print "Check which test was skopped"
+    print "Check which test was skipped"
     for test in test_cases:
-        if test not in automation_test_id_dict:
-            print "Test {} was skipped".format(test)
+        if test.work_item_id not in automation_test_id_dict.values():
+            print "Test {} was skipped".format(test.work_item_id)
     return automation_test_id_dict
 
 

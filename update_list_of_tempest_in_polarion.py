@@ -167,7 +167,7 @@ def get_polarion_tempest_test_cases():
 
     automation_test_id_dict = {}
     for test in test_cases:
-        for i in range(0, 100):
+        for i in range(0, 200):
             try:
                 automation_test_id_dict[test.get_custom_field(
                     'automation-test-id').value.encode()] = test.work_item_id
@@ -175,12 +175,10 @@ def get_polarion_tempest_test_cases():
             except SSLError:
                 continue
             except:
+                if i == 199:
+                    print "Test {} was skipped".format(test.work_item_id)
                 continue
     
-    print "Check which test was skipped"
-    for test in test_cases:
-        if test.work_item_id not in automation_test_id_dict.values():
-            print "Test {} was skipped".format(test.work_item_id)
     return automation_test_id_dict
 
 

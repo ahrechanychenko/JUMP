@@ -221,7 +221,7 @@ def get_polarion_tempest_test_cases():
                     if i == 9:
                         print "Test {} was skipped. Cannot connect to polarion after 10 attempts".format(test.work_item_id)
                     continue
-    print "dublicates count - {}".format(len(dublicates)
+    print "dublicates count - {}".format(len(dublicates))
     pprint.pprint(dublicates)
     return automation_test_id_dict
 

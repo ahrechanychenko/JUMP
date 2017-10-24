@@ -93,7 +93,8 @@ def get_tempest_test_list():
 def generate_testcase_xml_file(file_path, project_id,
                                posneg, title,
                                description,
-                               automation_test_id):
+                               automation_test_id,
+                               component):
     """
     Generate xml for each missed test case which must exist in Polarion
     Args:
@@ -116,7 +117,7 @@ def generate_testcase_xml_file(file_path, project_id,
       <custom-field content="{automation_test_id}" id="automation-test-id"/>
       <custom-field content="001" id="automation-env"/>
       <custom-field content="medium" id="caseimportance"/>
-      <custom-field content="Polarion-testing" id="casecomponent"/>
+      <custom-field content="{component}" id="casecomponent"/>
       <custom-field content="acceptance" id="caselevel"/>
       <custom-field content="{posneg}" id="caseposneg"/>
       <custom-field content="functional" id="testtype"/>
@@ -130,7 +131,8 @@ def generate_testcase_xml_file(file_path, project_id,
            title=title,
            description=description,
            posneg=posneg,
-           automation_test_id=automation_test_id)
+           automation_test_id=automation_test_id,
+           component=component)
     # write file
     with open('{file_path}/{name}.xml'.format(
             file_path=file_path,
@@ -226,6 +228,35 @@ def get_polarion_tempest_test_cases():
     return automation_test_id_dict
 
 
+def get_project_for_tempest_path(tempest_path):
+    """
+    :param tempest_path: str, tempest full path
+    :return: str, project_id
+    """
+    if "cinder" or "volume" in tempest_path:
+        return "Cinder"
+    elif "image" in tempest_path:
+        if "compute" in tempest_path:
+            return "Nova"
+        elif "neutron" or "network" in tempest_path:
+            return "Neutron"
+        elif "volume" in tempest_path:
+            return "Cinder"
+        else:
+            return "Glance"
+    elif "compute" in tempest_path:
+        return "Nova"
+    elif "neutron" or "network" in tempest_path:
+        return "Neutron"
+    elif "object_storage" in tempest_path:
+        return "Ceph"
+    elif "identity" in tempest_path:
+        return "Keystone"
+    else:
+        print "cannot find project for tempest test"
+        raise
+
+
 def check_tempest_test_in_polarion(tempest_lst, path):
     """
     Check if tempest test already exist in Polarion
@@ -251,7 +282,8 @@ def check_tempest_test_in_polarion(tempest_lst, path):
                 title="tempest test which covers {}".format(
                     test.split("[")[0]),
                 description="",
-                automation_test_id=test.split("[")[0])
+                automation_test_id=test.split("[")[0],
+                component=get_project_for_tempest_path(test))
         else:
             print "\n tempest test {} exist in Polarion {} project " \
                   "and covered by {}".format(test.split("[")[0],

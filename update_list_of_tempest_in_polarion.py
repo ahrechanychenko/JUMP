@@ -285,7 +285,7 @@ def check_tempest_test_in_polarion(tempest_lst, path):
                 project_id=PROJECT_ID,
                 posneg="negative" if "negative" in test else "positive",
                 title="tempest test which covers {}".format(
-                    test.split("[")[0].rsplit(".")[1]),
+                    test.split("[")[0].rsplit('.',1)[1]),
                 description="",
                 automation_test_id=test.split("[")[0],
                 component=get_project_for_tempest_path(test))

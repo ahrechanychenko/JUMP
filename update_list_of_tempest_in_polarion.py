@@ -8,6 +8,7 @@ import subprocess
 import logging
 import pprint
 from ssl import SSLError
+from suds import WebFault
 
 logging.getLogger('suds.client').setLevel(logging.CRITICAL)
 
@@ -155,6 +156,8 @@ def get_polarion_tempest_test_cases():
             break
         except SSLError:
             continue
+         except WebFault:
+            continue
         except:
             continue
 
@@ -166,13 +169,24 @@ def get_polarion_tempest_test_cases():
         exit(1)
 
     automation_test_id_dict = {}
+    dublicates = []
     for test in test_cases:
         for i in range(0, 200):
             try:
-                automation_test_id_dict[test.get_custom_field(
-                    'automation-test-id').value.encode()] = test.work_item_id
+                test_id = test.get_custom_field(
+                    'automation-test-id').value.encode()
+                if test_id in automation_test_id_dict.keys():
+                    print "test with that {} and {} id exist .skip it".format(test_id, test.work_item_id)
+                    dublicates.append(test.work_item_id)
+                automation_test_id_dict[test_id] = test.work_item_id
                 break
             except SSLError:
+                if i == 199:
+                    print "Test {} was skipped".format(test.work_item_id)
+                continue
+            except WebFault:
+                if i == 199:
+                    print "Test {} was skipped".format(test.work_item_id)
                 continue
             except:
                 if i == 199:
@@ -185,8 +199,12 @@ def get_polarion_tempest_test_cases():
             print "test {} was skip. Update dict".format(test.work_item_id)
             for i in range(0, 10):
                 try:
-                    automation_test_id_dict[test.get_custom_field(
-                        'automation-test-id').value.encode()] = test.work_item_id
+                    test_id = test.get_custom_field(
+                    'automation-test-id').value.encode()
+                    if test_id in automation_test_id_dict.keys():
+                        print "test with that {} and {} id exist .skip it".format(test_id, test.work_item_id)
+                        dublicates.append(test.work_item_id)
+                    automation_test_id_dict[test_id] = test.work_item_id
                     break
                 except SSLError:
                     print "Test {} was skipped. Retry".format(test.work_item_id)
@@ -198,7 +216,8 @@ def get_polarion_tempest_test_cases():
                     if i == 9:
                         print "Test {} was skipped. Cannot connect to polarion after 10 attempts".format(test.work_item_id)
                     continue
-
+    print "dublicates count - {}".format(len(dublicates)
+    pprint.pprint(dublicates)
     return automation_test_id_dict
 
 
@@ -212,7 +231,6 @@ def check_tempest_test_in_polarion(tempest_lst, path):
     """
     automation_test_id_dict = get_polarion_tempest_test_cases()
     print len(automation_test_id_dict)
-    print len(list(set(automation_test_id_dict.keys())))
     pprint.pprint(automation_test_id_dict)
     pprint.pprint(tempest_lst)
 
@@ -252,10 +270,9 @@ def update_test_cases_in_polarion(path):
         subprocess.check_call(cmd,
                               shell=True)
 
-
 if __name__ == "__main__":
     tempest_list = get_tempest_test_list()
-    print len(tempest_list)
+    print "tempest test count in upstream - {}".format(ilen(tempest_list))
     check_tempest_test_in_polarion(tempest_list, '/tmp/test_tempest_updater')
     if DRY_RUN:
         print "\n dry-run completed, xml files was generate"

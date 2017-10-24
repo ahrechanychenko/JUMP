@@ -277,7 +277,7 @@ def update_test_cases_in_polarion(path):
 
 if __name__ == "__main__":
     tempest_list = get_tempest_test_list()
-    print "tempest test count in upstream - {}".format(ilen(tempest_list))
+    print "tempest test count in upstream - {}".format(len(tempest_list))
     check_tempest_test_in_polarion(tempest_list, '/tmp/test_tempest_updater')
     if DRY_RUN:
         print "\n dry-run completed, xml files was generate"

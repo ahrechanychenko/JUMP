@@ -156,7 +156,7 @@ def get_polarion_tempest_test_cases():
             break
         except SSLError:
             continue
-         except WebFault:
+        except WebFault:
             continue
         except:
             continue
@@ -207,6 +207,11 @@ def get_polarion_tempest_test_cases():
                     automation_test_id_dict[test_id] = test.work_item_id
                     break
                 except SSLError:
+                    print "Test {} was skipped. Retry".format(test.work_item_id)
+                    if i == 9:
+                        print "Test {} was skipped. Cannot connect to polarion after 10 attempts".format(test.work_item_id)
+                    continue
+                except WebFault:
                     print "Test {} was skipped. Retry".format(test.work_item_id)
                     if i == 9:
                         print "Test {} was skipped. Cannot connect to polarion after 10 attempts".format(test.work_item_id)

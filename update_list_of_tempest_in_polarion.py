@@ -234,7 +234,12 @@ def get_project_for_tempest_path(tempest_path):
     :return: str, project_id
     """
     if "cinder" or "volume" in tempest_path:
-        return "Cinder"
+        if "compute" in tempest_path.rsplit('[')[1].split(',')[0]:
+            return "Nova"
+        elif "neutron" or "network" in tempest_path.rsplit('[')[1].split(',')[0]:
+            return "Neutron"
+        else:
+            return "Cinder"
     elif "image" in tempest_path:
         if "compute" in tempest_path:
             return "Nova"

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import re
 from pylarion import work_item
 import sys
 import argparse
@@ -69,7 +70,7 @@ def get_tempest_test_list():
                                shell=True,
                                stdout=subprocess.PIPE)
     out, err = process.communicate()
-    if len(out.split('\n')[1]) == 0:
+    if 'cloud-test' not in out:
         subprocess.check_call('cd /tmp/tempest && '
                               'tempest init cloud-test || true',
                               shell=True)
@@ -77,17 +78,18 @@ def get_tempest_test_list():
                           '&& mkdir /tmp/test_tempest_updater',
                           shell=True)
     # get list of test
-    process = subprocess.Popen("cd /tmp/tempest/cloud-test && tempest run -l",
-                               shell=True,
-                               stdout=subprocess.PIPE)
-    out, err = process.communicate()
-    tempest_test = out.split('\n')
+    subprocess.check_call("cd /tmp/tempest/cloud-test && tempest run -l > /tmp/tempest_list",
+                          shell=True)
+    with open('/tmp/tempest_list', 'r') as f:
+        tempest_test = f.readlines()
 
     # remove empty values
     tempest_test = filter(None, tempest_test)
+    # remove \n after
+    tempest_filtered = [re.sub('\n', '', x) for x in tempest_test]
 
     # return list of test
-    return tempest_test[5:]
+    return tempest_filtered
 
 
 def generate_testcase_xml_file(file_path, project_id,
@@ -175,7 +177,7 @@ def get_polarion_tempest_test_cases():
     for test in test_cases:
         for i in range(0, 200):
             try:
-                test_id = getattr(test,'automation-test-id').encode()
+                test_id = getattr(test, 'automation-test-id').encode()
                 if test_id in automation_test_id_dict.keys():
                     print "test with that {} and {} id exist .skip it".format(test_id, test.work_item_id)
                     dublicates.append(test.work_item_id)
@@ -195,10 +197,10 @@ def get_polarion_tempest_test_cases():
                 if i == 199:
                     print "Test {} was skipped".format(test.work_item_id)
                 continue
-    
-    #due to unstable polarion check if we have some skipped test
+
+    # due to unstable polarion check if we have some skipped test
     for test in test_cases:
-        test_id = getattr(test,'automation-test-id').encode()
+        test_id = getattr(test, 'automation-test-id').encode()
         if test_id not in automation_test_id_dict.keys():
             print "test {} was skip. Update dict".format(test.work_item_id)
             for i in range(0, 10):
@@ -208,17 +210,20 @@ def get_polarion_tempest_test_cases():
                 except SSLError:
                     print "Test {} was skipped. Retry".format(test.work_item_id)
                     if i == 9:
-                        print "Test {} was skipped. Cannot connect to polarion after 10 attempts".format(test.work_item_id)
+                        print "Test {} was skipped. Cannot connect to polarion after 10 attempts".format(
+                            test.work_item_id)
                     continue
                 except WebFault:
                     print "Test {} was skipped. Retry".format(test.work_item_id)
                     if i == 9:
-                        print "Test {} was skipped. Cannot connect to polarion after 10 attempts".format(test.work_item_id)
+                        print "Test {} was skipped. Cannot connect to polarion after 10 attempts".format(
+                            test.work_item_id)
                     continue
                 except:
                     print "Test {} was skipped. Retry".format(test.work_item_id)
                     if i == 9:
-                        print "Test {} was skipped. Cannot connect to polarion after 10 attempts".format(test.work_item_id)
+                        print "Test {} was skipped. Cannot connect to polarion after 10 attempts".format(
+                            test.work_item_id)
                     continue
     print "dublicates count - {}".format(len(dublicates))
     pprint.pprint(dublicates)
@@ -230,10 +235,11 @@ def get_project_for_tempest_path(tempest_path):
     :param tempest_path: str, tempest full path
     :return: str, project_id
     """
-    if any(("cinder" in tempest_path ,"volume" in tempest_path)):
+    if any(("cinder" in tempest_path, "volume" in tempest_path)):
         if "compute" in tempest_path.rsplit('[')[1].split(',')[0]:
             return "Nova"
-        elif any(("neutron" in tempest_path.rsplit('[')[1].split(',')[0], "network" in tempest_path.rsplit('[')[1].split(',')[0])):
+        elif any(("neutron" in tempest_path.rsplit('[')[1].split(',')[0],
+                  "network" in tempest_path.rsplit('[')[1].split(',')[0])):
             return "Neutron"
         else:
             return "Cinder"
@@ -272,7 +278,7 @@ def check_tempest_test_in_polarion(tempest_lst, path):
     pprint.pprint(automation_test_id_dict)
     pprint.pprint(tempest_lst)
 
-    #print test with exist in polarion but didn't exist in upstream
+    # print test with exist in polarion but didn't exist in upstream
     tempest_ids_upstream = [x.split("[")[0] for x in tempest_lst]
     for id in automation_test_id_dict.keys():
         if id not in tempest_ids_upstream:
@@ -287,7 +293,7 @@ def check_tempest_test_in_polarion(tempest_lst, path):
                 project_id=PROJECT_ID,
                 posneg="negative" if "negative" in test else "positive",
                 title="tempest test which covers {}".format(
-                    test.split("[")[0].rsplit('.',1)[1]),
+                    test.split("[")[0].rsplit('.', 1)[1]),
                 description="",
                 automation_test_id=test.split("[")[0],
                 component=get_project_for_tempest_path(test))
@@ -313,7 +319,6 @@ def update_test_cases_in_polarion(path):
         subprocess.check_call(cmd,
                               shell=True)
         print "{} was upload to Polarion".format(xml_file)
-
 
 
 if __name__ == "__main__":

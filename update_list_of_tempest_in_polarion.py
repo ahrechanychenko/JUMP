@@ -233,17 +233,17 @@ def get_project_for_tempest_path(tempest_path):
     :param tempest_path: str, tempest full path
     :return: str, project_id
     """
-    if "cinder" or "volume" in tempest_path:
+    if any(("cinder" in tempest_path ,"volume" in tempest_path)):
         if "compute" in tempest_path.rsplit('[')[1].split(',')[0]:
             return "Nova"
-        elif "neutron" or "network" in tempest_path.rsplit('[')[1].split(',')[0]:
+        elif any(("neutron" in tempest_path.rsplit('[')[1].split(',')[0], "network" in tempest_path.rsplit('[')[1].split(',')[0])):
             return "Neutron"
         else:
             return "Cinder"
     elif "image" in tempest_path:
         if "compute" in tempest_path:
             return "Nova"
-        elif "neutron" or "network" in tempest_path:
+        elif any(("neutron" in tempest_path, "network" in tempest_path)):
             return "Neutron"
         elif "volume" in tempest_path:
             return "Cinder"
@@ -251,7 +251,7 @@ def get_project_for_tempest_path(tempest_path):
             return "Glance"
     elif "compute" in tempest_path:
         return "Nova"
-    elif "neutron" or "network" in tempest_path:
+    elif any(("neutron" in tempest_path, "network" in tempest_path)):
         return "Neutron"
     elif "object_storage" in tempest_path:
         return "Ceph"

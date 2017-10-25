@@ -179,8 +179,10 @@ def get_polarion_tempest_test_cases():
                 if test_id in automation_test_id_dict.keys():
                     print "test with that {} and {} id exist .skip it".format(test_id, test.work_item_id)
                     dublicates.append(test.work_item_id)
-                automation_test_id_dict[test_id] = test.work_item_id
-                break
+                    break
+                else:
+                    automation_test_id_dict[test_id] = test.work_item_id
+                    break
             except SSLError:
                 if i == 199:
                     print "Test {} was skipped".format(test.work_item_id)
@@ -196,14 +198,11 @@ def get_polarion_tempest_test_cases():
     
     #due to unstable polarion check if we have some skipped test
     for test in test_cases:
-        if test.work_item_id not in automation_test_id_dict.values():
+        test_id = getattr(test,'automation-test-id').encode()
+        if test_id not in automation_test_id_dict.keys():
             print "test {} was skip. Update dict".format(test.work_item_id)
             for i in range(0, 10):
                 try:
-                    test_id = getattr(test,'automation-test-id').encode()
-                    if test_id in automation_test_id_dict.keys():
-                        print "test with that {} and {} id exist .skip it".format(test_id, test.work_item_id)
-                        dublicates.append(test.work_item_id)
                     automation_test_id_dict[test_id] = test.work_item_id
                     break
                 except SSLError:

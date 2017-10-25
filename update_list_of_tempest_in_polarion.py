@@ -53,7 +53,7 @@ sys.setdefaultencoding('utf8')
 # get variables values
 PROJECT_ID = args.project_id
 POLARION_USER = args.polarion_user
-POLARION_PASS = args.polarion_user
+POLARION_PASS = args.polarion_password
 DRY_RUN = args.dry_run
 
 

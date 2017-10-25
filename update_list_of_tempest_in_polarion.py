@@ -308,9 +308,9 @@ def update_test_cases_in_polarion(path):
               '-F file=@/{}/{} ' \
               'https://polarion.engineering.redhat.com' \
               '//polarion/import/testcase'.format(path, xml_file)
-        print "{} was upload to Polarion".format(xml_file)
         subprocess.check_call(cmd,
                               shell=True)
+        print "{} was upload to Polarion".format(xml_file)
 
 if __name__ == "__main__":
     tempest_list = get_tempest_test_list()

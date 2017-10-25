@@ -272,6 +272,11 @@ def check_tempest_test_in_polarion(tempest_lst, path):
     pprint.pprint(automation_test_id_dict)
     pprint.pprint(tempest_lst)
 
+    #print test with exist in polarion but didn't exist in upstream
+    tempest_ids_upstream = [x.split("[")[0] for x in tempest_lst]
+    for id in automation_test_id_dict.keys():
+        if id not in tempest_ids_upstream:
+            print "test {} not present in upstream".format(id)
     for test in tempest_lst:
         print "check test {}".format(test)
         if test.split("[")[0] not in automation_test_id_dict:
@@ -308,6 +313,8 @@ def update_test_cases_in_polarion(path):
         subprocess.check_call(cmd,
                               shell=True)
         print "{} was upload to Polarion".format(xml_file)
+
+
 
 if __name__ == "__main__":
     tempest_list = get_tempest_test_list()

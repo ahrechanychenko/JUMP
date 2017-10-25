@@ -89,7 +89,7 @@ def get_tempest_test_list():
     tempest_filtered = [re.sub('\n', '', x) for x in tempest_test]
 
     # return list of test
-    return tempest_filtered
+    return tempest_filtered[4:]
 
 
 def generate_testcase_xml_file(file_path, project_id,

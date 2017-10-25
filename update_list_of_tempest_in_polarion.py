@@ -10,6 +10,8 @@ import logging
 import pprint
 from ssl import SSLError
 from suds import WebFault
+from xml.dom import minidom
+
 
 logging.getLogger('suds.client').setLevel(logging.CRITICAL)
 
@@ -58,7 +60,7 @@ POLARION_PASS = args.polarion_password
 DRY_RUN = args.dry_run
 
 
-def get_tempest_test_list():
+def get_tempest_test_list(xml_file):
     """
     1) check if tempest workspace cloud-test exist and init it doesn't exist
     2) run 'tempest run -l' to get list of default test
@@ -66,30 +68,13 @@ def get_tempest_test_list():
         list with names of tempest test
     """
     # check if we already have tempest workspace
-    process = subprocess.Popen("tempest workspace list",
-                               shell=True,
-                               stdout=subprocess.PIPE)
-    out, err = process.communicate()
-    if 'cloud-test' not in out:
-        subprocess.check_call('cd /tmp/tempest && '
-                              'tempest init cloud-test || true',
-                              shell=True)
-    subprocess.check_call('rm -rf /tmp/test_tempest_updater '
-                          '&& mkdir /tmp/test_tempest_updater',
-                          shell=True)
-    # get list of test
-    subprocess.check_call("cd /tmp/tempest/cloud-test && tempest run -l > /tmp/tempest_list",
-                          shell=True)
-    with open('/tmp/tempest_list', 'r') as f:
-        tempest_test = f.readlines()
-
-    # remove empty values
-    tempest_test = filter(None, tempest_test)
-    # remove \n after
-    tempest_filtered = [re.sub('\n', '', x) for x in tempest_test]
-
-    # return list of test
-    return tempest_filtered[4:]
+    xml_file = minidom.parse(xml_file)
+    tempest_list = []
+    for test_case_xml in xml_file.getElementsByTagName('testcase'):
+        name = test_case_xml.attributes['name'].value
+        classname = test_case_xml.attributes['classname'].value
+        tempest_list.append(name+classname)
+    return tempest_list
 
 
 def generate_testcase_xml_file(file_path, project_id,

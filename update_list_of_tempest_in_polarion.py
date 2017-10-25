@@ -154,7 +154,7 @@ def get_polarion_tempest_test_cases():
         try:
             test_cases = work_item.TestCase.query(
                 query="automation-test-id:tempest.* AND automation-env:001",
-                project_id='RHELOpenStackPlatform')
+                project_id='RHELOpenStackPlatform', fields=["automation-test-id", "work_item_id"])
             break
         except SSLError:
             continue
@@ -175,8 +175,7 @@ def get_polarion_tempest_test_cases():
     for test in test_cases:
         for i in range(0, 200):
             try:
-                test_id = test.get_custom_field(
-                    'automation-test-id').value.encode()
+                test_id = getattr(test,'automation-test-id').encode()
                 if test_id in automation_test_id_dict.keys():
                     print "test with that {} and {} id exist .skip it".format(test_id, test.work_item_id)
                     dublicates.append(test.work_item_id)
@@ -201,8 +200,7 @@ def get_polarion_tempest_test_cases():
             print "test {} was skip. Update dict".format(test.work_item_id)
             for i in range(0, 10):
                 try:
-                    test_id = test.get_custom_field(
-                    'automation-test-id').value.encode()
+                    test_id = getattr(test,'automation-test-id').encode()
                     if test_id in automation_test_id_dict.keys():
                         print "test with that {} and {} id exist .skip it".format(test_id, test.work_item_id)
                         dublicates.append(test.work_item_id)

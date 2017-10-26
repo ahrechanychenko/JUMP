@@ -55,7 +55,7 @@ def main():
     if args.xml_file:
         if args.update_testcases:
             update_test_cases_with_tempest_tests(args.xml_file, args.project_id, args.dry_run)
-            print "\n wait for 5 minutes after importing test cases before update test run\n"
+            print "\n wait for 5 minutes after importing test cases before update test run\n "
             time.sleep(5*60)
         custom_fields = process_properties_fields(args.custom_fields)
         properties = {

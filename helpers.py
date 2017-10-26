@@ -446,3 +446,4 @@ def update_test_cases_with_tempest_tests(xml_file, project, dry_run):
         print "DRY_MODE ENABLED: Skip uploading test cases"
     else:
         upload_test_cases_in_polarion(path='/tmp/test_tempest_updater')
+

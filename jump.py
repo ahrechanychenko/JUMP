@@ -44,7 +44,7 @@ def main():
                         help="duration time, for example 1.123", required=True, type=float)
     parser.add_argument('--testcases', required=False, help="list of testcases and their results - passed|failed \n "
                                                             "for example: 'TEST_CASE1=passed, TEST_CASE2=failed'")
-    parser.add_argument('--update_testcases', required=False, help="Sync Polarion test cases with tests from xml file")
+    parser.add_argument('--update_testcases', type=bool, required=False, help="Sync Polarion test cases with tests from xml file")
     parser.add_argument("--dry_run",
                         type=bool,
                         help="generate xml files with missed tempest "
@@ -79,7 +79,7 @@ def main():
                                         test_cases=manual_testcases,
                                         test_comment=args.jenkins_build_url,
                                         executed_by=args.user_id,
-                                        duration=10.00)
+                                        duration=args.duration)
     else:
         print "Please choose between xml mode and manual"
 

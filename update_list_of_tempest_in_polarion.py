@@ -289,7 +289,7 @@ def check_tempest_test_in_polarion(tempest_lst, path):
                                              automation_test_id_dict[test.split("[")[0]])
 
 
-def update_test_cases_in_polarion(path):
+def upload_test_cases_in_polarion(path):
     """
         Upload test cases which cover
         missed tempest tests via curl to stage job
@@ -314,4 +314,4 @@ if __name__ == "__main__":
         print "\n dry-run completed, xml files was generate"
         exit(0)
     else:
-        update_test_cases_in_polarion(path='/tmp/test_tempest_updater')
+        upload_test_cases_in_polarion(path='/tmp/test_tempest_updater')

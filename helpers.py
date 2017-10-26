@@ -439,7 +439,10 @@ def get_test_run_instance(test_run_id, project_id):
             continue
 
 
-def update_test_cases_with_tempest_tests(xml_file, project):
+def update_test_cases_with_tempest_tests(xml_file, project, dry_run):
     tempest_list = get_tempest_test_list(xml_file)
     check_tempest_test_in_polarion(tempest_lst=tempest_list, xml_dir='/tmp/test_tempest_updater', project=project)
-    upload_test_cases_in_polarion(path='/tmp/test_tempest_updater')
+    if dry_run:
+        print "DRY_MODE ENABLED: Skip uploading test cases"
+    else:
+        upload_test_cases_in_polarion(path='/tmp/test_tempest_updater')

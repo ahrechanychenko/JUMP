@@ -53,7 +53,7 @@ def main():
     args = parser.parse_args()
     if args.xml_file:
         if args.update_testcases:
-            update_test_cases_with_tempest_tests(args.xml_file, args.project_id)
+            update_test_cases_with_tempest_tests(args.xml_file, args.project_id, args.dry_run)
         custom_fields = process_properties_fields(args.custom_fields)
         properties = {
             "project-id": args.project_id,
@@ -63,13 +63,15 @@ def main():
             "testrun-id": args.testrun_id,
             "testrun-title": args.testrun_title
         }
-
-        test_cases = get_polarion_tempest_test_cases(args.project_id)
-        process_xml(args.xml_file,
-                    args.output_xml,
-                    custom_fields=custom_fields,
-                    properties=properties,
-                    polarion_test_cases=test_cases)
+        if args.dry_run:
+            print "skip updating results due to dry_run"
+        else:
+            test_cases = get_polarion_tempest_test_cases(args.project_id)
+            process_xml(args.xml_file,
+                        args.output_xml,
+                        custom_fields=custom_fields,
+                        properties=properties,
+                        polarion_test_cases=test_cases)
     elif args.testcases:
         manual_testcases = dict((x, y) for x, y in [tuple(i.split('=')) for i in args.testcases.split(',')])
         test_run_instance = get_test_run_instance(test_run_id=args.testrun_id, project_id=args.project_id)

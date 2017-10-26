@@ -3,6 +3,7 @@ import time
 
 from helpers import get_polarion_tempest_test_cases
 from helpers import update_test_cases_with_tempest_tests
+from helpers import update_test_run
 from helpers import manual_update_polarion_test_run
 from helpers import get_test_run_instance
 from helpers import process_properties_fields
@@ -75,6 +76,7 @@ def main():
                         custom_fields=custom_fields,
                         properties=properties,
                         polarion_test_cases=test_cases)
+            update_test_run(args.output_xml, args.testrun_id)
     elif args.testcases:
         manual_testcases = dict((x, y) for x, y in [tuple(i.split('=')) for i in args.testcases.split(',')])
         test_run_instance = get_test_run_instance(test_run_id=args.testrun_id, project_id=args.project_id)

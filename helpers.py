@@ -2,7 +2,10 @@ import os
 import re
 import sys
 import subprocess
+import logging
+import shutil
 
+from suds.client import Client
 from ssl import SSLError
 from xml.dom import minidom
 from suds import WebFault
@@ -10,6 +13,7 @@ from suds import WebFault
 from pylarion import test_run
 from pylarion import work_item
 
+logging.getLogger('suds.client').setLevel(logging.CRITICAL)
 
 def process_xml(xml_file, out_xml, custom_fields, properties, polarion_test_cases):
     xml_file = minidom.parse(xml_file)
@@ -137,6 +141,10 @@ def generate_testcase_xml_file(file_path, project_id,
            automation_test_id=automation_test_id,
            component=component)
     # write file
+    if not os.path.isdir(file_path):
+        os.mkdir(file_path)
+    else:
+        os.system("cd {} && rm -rf *".format(file_path))
     with open('{file_path}/{name}.xml'.format(
             file_path=file_path,
             name=automation_test_id),
@@ -180,7 +188,7 @@ def get_polarion_tempest_test_cases(project):
             try:
                 test_id = getattr(test, 'automation-test-id').encode()
                 if test_id in automation_test_id_dict.keys():
-                    print "Dublicated test: {} with test_case id {} " \
+                    print "Duplicated test: {} with test_case id {} " \
                           "already exist in Polarion and has test case id - {}. " \
                           "Skip it".format(test_id, test.work_item_id, automation_test_id_dict[test_id])
                     duplicates.append(test.work_item_id)
@@ -313,6 +321,16 @@ def upload_test_cases_in_polarion(path):
         subprocess.check_call(cmd,
                               shell=True)
         print "{} was upload to Polarion".format(xml_file)
+
+
+def update_test_run(xml_file, test_run_id):
+    cmd = 'curl -k -u rhosp_machine:polarion -X POST ' \
+          '-F file=@./{} ' \
+          'https://polarion.engineering.redhat.com' \
+          '//polarion/import/xunit'.format(xml_file)
+    subprocess.check_call(cmd,
+                          shell=True)
+    print "Test run {} was updated with tempest results".format(test_run_id)
 
 
 def get_test_case_with_incorrect_env():

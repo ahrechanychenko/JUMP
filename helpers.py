@@ -2,9 +2,6 @@ import os
 import re
 import sys
 import subprocess
-import logging
-import pprint
-import datetime
 
 from ssl import SSLError
 from xml.dom import minidom
@@ -12,10 +9,6 @@ from suds import WebFault
 
 from pylarion import test_run
 from pylarion import work_item
-
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 def process_xml(xml_file, out_xml, custom_fields, properties, polarion_test_cases):
@@ -47,8 +40,7 @@ def process_xml(xml_file, out_xml, custom_fields, properties, polarion_test_case
                 print "Test with automation-test id {} not exist in Polarion.Skip it".format(full_name_without_uuid)
                 continue
 
-            logger.info("Writing polarion-testcase-id: %s",
-                        polarion_test_cases[full_name_without_uuid])
+            print "Writing polarion-testcase-id: {}".format(polarion_test_cases[full_name_without_uuid])
             properties = xml_file.createElement('properties')
             new_property = xml_file.createElement('property')
             new_property.setAttribute('name', 'polarion-testcase-id')
@@ -95,7 +87,9 @@ def get_tempest_test_list(xml_file):
     for test_case_xml in xml_file.getElementsByTagName('testcase'):
         name = test_case_xml.attributes['name'].value
         classname = test_case_xml.attributes['classname'].value
-        tempest_list.append(name+classname)
+        if not classname:
+            continue
+        tempest_list.append(classname + "." + name)
     return tempest_list
 
 
@@ -186,7 +180,9 @@ def get_polarion_tempest_test_cases(project):
             try:
                 test_id = getattr(test, 'automation-test-id').encode()
                 if test_id in automation_test_id_dict.keys():
-                    print "Dublicated test {} - with {} id. Skip it".format(test_id, test.work_item_id)
+                    print "Dublicated test: {} with test_case id {} " \
+                          "already exist in Polarion and has test case id - {}. " \
+                          "Skip it".format(test_id, test.work_item_id, automation_test_id_dict[test_id])
                     duplicates.append(test.work_item_id)
                     break
                 else:
@@ -281,7 +277,6 @@ def check_tempest_test_in_polarion(tempest_lst, xml_dir, project):
     """
     automation_test_id_dict = get_polarion_tempest_test_cases(project)
     # print test with exist in polarion but didn't exist in upstream
-    tempest_ids_from_xml = [x.split("[")[0] for x in tempest_lst]
     for test in tempest_lst:
         print "check test {}".format(test)
         if test.split("[")[0] not in automation_test_id_dict:
@@ -446,3 +441,4 @@ def update_test_cases_with_tempest_tests(xml_file, project, dry_run):
         print "DRY_MODE ENABLED: Skip uploading test cases"
     else:
         upload_test_cases_in_polarion(path='/tmp/test_tempest_updater')
+

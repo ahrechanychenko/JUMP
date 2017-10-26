@@ -1,4 +1,5 @@
 import argparse
+import time
 
 from helpers import get_polarion_tempest_test_cases
 from helpers import update_test_cases_with_tempest_tests
@@ -44,7 +45,7 @@ def main():
                         help="duration time, for example 1.123", required=True, type=float)
     parser.add_argument('--testcases', required=False, help="list of testcases and their results - passed|failed \n "
                                                             "for example: 'TEST_CASE1=passed, TEST_CASE2=failed'")
-    parser.add_argument('--update_testcases', required=False, help="Sync Polarion test cases with tests from xml file")
+    parser.add_argument('--update_testcases', type=bool, required=False, help="Sync Polarion test cases with tests from xml file")
     parser.add_argument("--dry_run",
                         type=bool,
                         help="generate xml files with missed tempest "
@@ -54,6 +55,8 @@ def main():
     if args.xml_file:
         if args.update_testcases:
             update_test_cases_with_tempest_tests(args.xml_file, args.project_id, args.dry_run)
+            print "\n wait for 5 minutes after importing test cases before update test run\n"
+            time.sleep(5*60)
         custom_fields = process_properties_fields(args.custom_fields)
         properties = {
             "project-id": args.project_id,
@@ -79,7 +82,7 @@ def main():
                                         test_cases=manual_testcases,
                                         test_comment=args.jenkins_build_url,
                                         executed_by=args.user_id,
-                                        duration=10.00)
+                                        duration=args.duration)
     else:
         print "Please choose between xml mode and manual"
 

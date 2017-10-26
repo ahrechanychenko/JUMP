@@ -49,8 +49,6 @@ def main():
                         type=bool,
                         help="generate xml files with missed tempest "
                              "test cases and don't upload them to Polarion")
-    parser.add_argument("--jenkins_build_url",
-                        help="url for jenkins build where test was executed", required=False)
 
     args = parser.parse_args()
     if args.xml_file:

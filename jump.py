@@ -82,3 +82,6 @@ def main():
                                         duration=10.00)
     else:
         print "Please choose between xml mode and manual"
+
+if __name__ == "__main__":
+    main()

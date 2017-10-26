@@ -141,10 +141,10 @@ def generate_testcase_xml_file(file_path, project_id,
            automation_test_id=automation_test_id,
            component=component)
     # write file
-    if not os.path.isdir(file_path):
-        os.mkdir(file_path)
-    else:
+    if os.path.isdir(file_path):
         os.system("cd {} && rm -rf *".format(file_path))
+    else:
+        os.mkdir(file_path)
     with open('{file_path}/{name}.xml'.format(
             file_path=file_path,
             name=automation_test_id),
@@ -458,5 +458,8 @@ def update_test_cases_with_tempest_tests(xml_file, project, dry_run):
     if dry_run:
         print "DRY_MODE ENABLED: Skip uploading test cases"
     else:
-        upload_test_cases_in_polarion(path='/tmp/test_tempest_updater')
+        if os.path.isdir('/tmp/test_tempest_updater'):
+            upload_test_cases_in_polarion(path='/tmp/test_tempest_updater')
+        else:
+            print "All test cases from xml file are exist in Polarion"
 

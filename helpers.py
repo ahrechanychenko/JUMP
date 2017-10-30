@@ -15,9 +15,31 @@ from pylarion import work_item
 
 logging.getLogger('suds.client').setLevel(logging.CRITICAL)
 
-def process_xml(xml_file, out_xml, custom_fields, properties, polarion_test_cases):
-    xml_file = minidom.parse(xml_file)
 
+def process_xml(out_xml, custom_fields, properties,
+                polarion_tempest_test_cases=None, xml_file=None, manual_test_cases=None,
+                jenkins_build_url=None):
+    if manual_test_cases:
+        xml_file = minidom.Document()
+        test_suites = xml_file.createElement("testsuite")
+        xml_file.appendChild(test_suites)
+        test_suites.setAttribute("tests", "{}".format(len(manual_test_cases)))
+        test_suites.setAttribute("failures", "{}".format(manual_test_cases.values().count("failed")))
+        for test in manual_test_cases:
+            test_cases_el = xml_file.createElement("testcase")
+            test_cases_el.setAttribute("classname", "test")
+            test_cases_el.setAttribute("name", "{}".format(test))
+            if manual_test_cases[test] == "failed":
+                failure_el = xml_file.createElement("failure")
+                failure_el.setAttribute("type","failure")
+                test_cases_el.appendChild(failure_el)
+            test_suites.appendChild(test_cases_el)
+
+    elif polarion_tempest_test_cases:
+        xml_file = minidom.parse(xml_file)
+    else:
+        print "Cannot proceed without xml with tempest results"
+        exit(1)
     res_doc = minidom.Document()
     test_suites = res_doc.createElement('testsuites')
 
@@ -37,20 +59,27 @@ def process_xml(xml_file, out_xml, custom_fields, properties, polarion_test_case
         try:
             if not classname:
                 continue
-            full_name = "{}.{}".format(classname, name)
-            full_name_without_uuid = re.match(
-                r'(.*)\[(.*id-)*(.*)\].*', full_name).group(1)
-            if full_name_without_uuid not in polarion_test_cases.keys():
-                print "Test with automation-test id {} not exist in Polarion.Skip it".format(full_name_without_uuid)
-                continue
-
-            print "Writing polarion-testcase-id: {}".format(polarion_test_cases[full_name_without_uuid])
+            if not manual_test_cases:
+                full_name = "{}.{}".format(classname, name)
+                full_name_without_uuid = re.match(
+                    r'(.*)\[(.*id-)*(.*)\].*', full_name).group(1)
+                if full_name_without_uuid not in polarion_tempest_test_cases.keys():
+                    print "Test with automation-test id {} not exist in Polarion.Skip it".format(full_name_without_uuid)
+                    continue
+                print "Writing polarion-testcase-id: {}".format(polarion_tempest_test_cases[full_name_without_uuid])
             properties = xml_file.createElement('properties')
             new_property = xml_file.createElement('property')
             new_property.setAttribute('name', 'polarion-testcase-id')
-            new_property.setAttribute('value', polarion_test_cases[full_name_without_uuid])
+            if manual_test_cases:
+                new_property.setAttribute('value', name)
+            else:
+                new_property.setAttribute('value', polarion_tempest_test_cases[full_name_without_uuid])
             properties.appendChild(new_property)
-
+            if jenkins_build_url:
+                new_property = xml_file.createElement('property')
+                new_property.setAttribute('name', 'polarion-testcase-comment')
+                new_property.setAttribute('value', jenkins_build_url)
+                properties.appendChild(new_property)
             test_case_xml.appendChild(properties)
 
         except (AttributeError, IndexError):
@@ -333,7 +362,7 @@ def update_test_run(xml_file, test_run_id):
     print "Test run {} was updated with tempest results".format(test_run_id)
 
 
-def get_test_case_with_incorrect_env():
+def get_test_case_with_incorrect_env(project_id):
     """
     Connect to Polarion and get test cases where automation-test-id:tempest.*
     :return: list, pylarion Testcase objects
@@ -342,7 +371,7 @@ def get_test_case_with_incorrect_env():
         try:
             test_cases = work_item.TestCase.query(
                 query="automation-test-id:tempest.* AND NOT automation-env:001",
-                project_id=PROJECT_ID)
+                project_id=project_id)
             break
         except SSLError:
             continue
@@ -407,49 +436,6 @@ def update_test_with_wrong_automation_id(test_cases):
             print "test {} wasn't update in due to Polarion problems.Skip it".format(test.work_item_id)
         except:
             print "test {} wasn't update in due to Polarion problems.Skip it".format(test.work_item_id)
-
-
-def manual_update_polarion_test_run(tr_instance,
-                             test_cases,
-                             test_comment,
-                             executed_by,
-                             executed,
-                             duration):
-        for test_case_id in test_cases:
-            try:
-                tr_instance.update_test_record_by_fields(
-                    test_case_id,
-                    test_cases[test_case_id],
-                    test_comment,
-                    executed_by,
-                    executed,
-                    duration)
-
-            except WebFault:
-                print "test case {} was skip due to Polarion issue".format(test_case_id)
-            except SSLError:
-                print "test case {} was skip due to Polarion issue".format(test_case_id)
-            except:
-                print "test case {} was skip due to Polarion issue".format(test_case_id)
-
-
-def get_test_run_instance(test_run_id, project_id):
-    for i in range(0,10):
-        try:
-            tr = test_run.TestRun(test_run_id=test_run_id, project_id=project_id)
-            break
-        except WebFault:
-            if i == 9:
-                print "cannot get test run instance via pylarion during to connection issues"
-            continue
-        except SSLError:
-            if i == 9:
-                print "cannot get test run instance via pylarion during to connection issues"
-            continue
-        except:
-            if i == 9:
-                print "cannot get test run instance via pylarion during to connection issues"
-            continue
 
 
 def update_test_cases_with_tempest_tests(xml_file, project, dry_run):

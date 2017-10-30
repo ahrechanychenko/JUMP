@@ -4,8 +4,6 @@ import time
 from helpers import get_polarion_tempest_test_cases
 from helpers import update_test_cases_with_tempest_tests
 from helpers import update_test_run
-from helpers import manual_update_polarion_test_run
-from helpers import get_test_run_instance
 from helpers import process_properties_fields
 from helpers import process_xml
 
@@ -42,8 +40,6 @@ def main():
                         help='Properties separated with commas')
     parser.add_argument("--jenkins_build_url",
                         help="url for jenkins build where test was executed", required=False)
-    parser.add_argument("--duration",
-                        help="duration time, for example 1.123", required=True, type=float)
     parser.add_argument('--testcases', required=False, help="list of testcases and their results - passed|failed \n "
                                                             "for example: 'TEST_CASE1=passed, TEST_CASE2=failed'")
     parser.add_argument('--update_testcases', type=bool, required=False, help="Sync Polarion test cases with tests from xml file")
@@ -71,20 +67,31 @@ def main():
             print "skip updating results due to dry_run"
         else:
             test_cases = get_polarion_tempest_test_cases(args.project_id)
-            process_xml(args.xml_file,
-                        args.output_xml,
+            process_xml(xml_file=args.xml_file,
+                        out_xml=args.output_xml,
                         custom_fields=custom_fields,
                         properties=properties,
-                        polarion_test_cases=test_cases)
+                        polarion_tempest_test_cases=test_cases,
+                        jenkins_build_url=args.jenkins_build_url)
             update_test_run(args.output_xml, args.testrun_id)
     elif args.testcases:
         manual_testcases = dict((x, y) for x, y in [tuple(i.split('=')) for i in args.testcases.split(',')])
-        test_run_instance = get_test_run_instance(test_run_id=args.testrun_id, project_id=args.project_id)
-        manual_update_polarion_test_run(tr_instance=test_run_instance,
-                                        test_cases=manual_testcases,
-                                        test_comment=args.jenkins_build_url,
-                                        executed_by=args.user_id,
-                                        duration=args.duration)
+        print manual_testcases
+        custom_fields = process_properties_fields(args.custom_fields)
+        properties = {
+            "project-id": args.project_id,
+            "user-id": args.user_id,
+            "set-testrun-finished": args.testrun_finished,
+            "include-skipped": args.include_skipped,
+            "testrun-id": args.testrun_id,
+            "testrun-title": args.testrun_title
+        }
+        process_xml(out_xml=args.output_xml,
+                    custom_fields=custom_fields,
+                    properties=properties,
+                    manual_test_cases=manual_testcases,
+                    jenkins_build_url=args.jenkins_build_url)
+        update_test_run(args.output_xml, args.testrun_id)
     else:
         print "Please choose between xml mode and manual"
 

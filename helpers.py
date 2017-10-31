@@ -169,10 +169,6 @@ def generate_testcase_xml_file(file_path, project_id,
            automation_test_id=automation_test_id,
            component=component)
     # write file
-    if os.path.isdir(file_path):
-        os.system("cd {} && rm -rf *".format(file_path))
-    else:
-        os.mkdir(file_path)
     with open('{file_path}/{name}.xml'.format(
             file_path=file_path,
             name=automation_test_id),
@@ -310,7 +306,7 @@ def check_tempest_test_in_polarion(tempest_lst, xml_dir, project):
     Check if tempest test already exist in Polarion
     and if not - generate xml for importing
     :param tempest_lst: list, list with tempest tests
-    :param path: str, path in system for storing xml,
+    :param xml_dir: str, path in system for storing xml,
     by default - '/tmp/test_tempest_updater'
     """
     automation_test_id_dict = get_polarion_tempest_test_cases(project)
@@ -443,19 +439,22 @@ def update_test_with_wrong_automation_id(test_cases):
             print "test {} wasn't update in due to Polarion problems.Skip it".format(test.work_item_id)
 
 
-def update_test_cases_with_tempest_tests(xml_file, project, dry_run):
+def update_test_cases_with_tempest_tests(xml_file, project, path, dry_run):
     tempest_list = get_tempest_test_list(xml_file)
     print "\nCheck for missed test cases from xml in Polarion \n"
-    check_tempest_test_in_polarion(tempest_lst=tempest_list, xml_dir='/tmp/test_tempest_updater', project=project)
+    if os.path.isdir(path):
+        os.system("cd {} && rm -rf *".format(path))
+    else:
+        os.mkdir(path)
+    check_tempest_test_in_polarion(tempest_lst=tempest_list, xml_dir=path, project=project)
     if dry_run:
         print "DRY_MODE ENABLED: Skip uploading test cases"
     else:
-        if os.path.isdir('/tmp/test_tempest_updater'):
-            if len([name for name in os.listdir('/tmp/test_tempest_updater') if os.path.isfile(
-                    os.path.join('/tmp/test_tempest_updater', name))]) > 0:
-                upload_test_cases_in_polarion(path='/tmp/test_tempest_updater')
-                print "\n wait for 5 minutes after importing test cases before update test run\n "
-                time.sleep(5 * 60)
+        if len([name for name in os.listdir(path) if os.path.isfile(
+                os.path.join(path, name))]) > 0:
+            upload_test_cases_in_polarion(path=path)
+            print "\n wait for 5 minutes after importing test cases before update test run\n "
+            time.sleep(5 * 60)
         else:
             print "All test cases from xml file are exist in Polarion"
 

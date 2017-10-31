@@ -50,7 +50,8 @@ def main():
     args = parser.parse_args()
     if args.xml_file:
         if args.update_testcases:
-            update_test_cases_with_tempest_tests(args.xml_file, args.project_id, args.dry_run)
+            update_test_cases_with_tempest_tests(xml_file=args.xml_file, project=args.project_id, dry_run=args.dry_run,
+                                                 path='/tmp/test_tempest_dir')
         custom_fields = process_properties_fields(args.custom_fields)
         properties = {
             "project-id": args.project_id,

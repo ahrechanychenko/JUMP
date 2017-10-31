@@ -1,16 +1,15 @@
 import os
 import re
-import sys
 import subprocess
 import logging
-import shutil
+import pprint
+import time
 
 from suds.client import Client
 from ssl import SSLError
 from xml.dom import minidom
 from suds import WebFault
 
-from pylarion import test_run
 from pylarion import work_item
 
 logging.getLogger('suds.client').setLevel(logging.CRITICAL)
@@ -212,15 +211,14 @@ def get_polarion_tempest_test_cases(project):
 
     automation_test_id_dict = {}
     duplicates = []
+    print "Get all test cases from Polarion with automation-test-id:tempest.* and automation-env:001"
     for test in test_cases:
         for i in range(0, 200):
             try:
                 test_id = getattr(test, 'automation-test-id').encode()
                 if test_id in automation_test_id_dict.keys():
-                    print "Duplicated test: {} with test_case id {} " \
-                          "already exist in Polarion and has test case id - {}. " \
-                          "Skip it".format(test_id, test.work_item_id, automation_test_id_dict[test_id])
-                    duplicates.append(test.work_item_id)
+                    duplicates.append("{} and {} have the same automation-test-id:{}".format(
+                        test.work_item_id, automation_test_id_dict[test_id], test_id))
                     break
                 else:
                     automation_test_id_dict[test_id] = test.work_item_id
@@ -265,7 +263,10 @@ def get_polarion_tempest_test_cases(project):
                         print "Test {} was skipped. Cannot connect to polarion after 10 attempts".format(
                             test.work_item_id)
                     continue
-    print "duplicates count - {}".format(len(duplicates))
+    print "List of duplicated test with automation-test-id:tempest* and automation-env:001"
+    pprint.pprint(duplicates)
+    print "\n Full list of tests with automation-test-id:tempest* and automation-env:001"
+    pprint.pprint(automation_test_id_dict)
     return automation_test_id_dict
 
 
@@ -314,11 +315,11 @@ def check_tempest_test_in_polarion(tempest_lst, xml_dir, project):
     """
     automation_test_id_dict = get_polarion_tempest_test_cases(project)
     # print test with exist in polarion but didn't exist in upstream
+    generated_list = []
     for test in tempest_lst:
         print "check test {}".format(test)
         if test.split("[")[0] not in automation_test_id_dict:
-            print "\n {} doesn't exist in Polarion, " \
-                  "generate xml for it".format(test.split("[")[0])
+            generated_list.append(test.split("[")[0])
             generate_testcase_xml_file(
                 file_path=xml_dir,
                 project_id=project,
@@ -329,10 +330,14 @@ def check_tempest_test_in_polarion(tempest_lst, xml_dir, project):
                 automation_test_id=test.split("[")[0],
                 component=get_project_for_tempest_path(test))
         else:
-            print "\n tempest test {} exist in Polarion {} project " \
-                  "and covered by {}".format(test.split("[")[0],
+            print "tempest test {} exist in Polarion {} project " \
+                  "and covered by {}\n".format(test.split("[")[0],
                                              project,
                                              automation_test_id_dict[test.split("[")[0]])
+    if len(generated_list)>0:
+        print "Generated xml files for next automation-test-id:"
+        pprint.pprint(generated_list)
+        print "\n"
 
 
 def upload_test_cases_in_polarion(path):
@@ -387,7 +392,7 @@ def get_test_case_with_incorrect_env(project_id):
     return test_cases
 
 
-def get_test_case_objects_with_correct_automation_id():
+def get_test_case_objects_with_correct_automation_id(project_id):
     """
     Connect to Polarion and get test cases where automation-test-id:tempest.*
     :return: list, pylarion Testcase objects
@@ -396,7 +401,7 @@ def get_test_case_objects_with_correct_automation_id():
         try:
             test_cases = work_item.TestCase.query(
                 query="automation-test-id:tempest.* AND automation-env:001",
-                project_id=PROJECT_ID)
+                project_id=project_id)
             break
         except SSLError:
             continue
@@ -440,12 +445,17 @@ def update_test_with_wrong_automation_id(test_cases):
 
 def update_test_cases_with_tempest_tests(xml_file, project, dry_run):
     tempest_list = get_tempest_test_list(xml_file)
+    print "\nCheck for missed test cases from xml in Polarion \n"
     check_tempest_test_in_polarion(tempest_lst=tempest_list, xml_dir='/tmp/test_tempest_updater', project=project)
     if dry_run:
         print "DRY_MODE ENABLED: Skip uploading test cases"
     else:
         if os.path.isdir('/tmp/test_tempest_updater'):
-            upload_test_cases_in_polarion(path='/tmp/test_tempest_updater')
+            if len([name for name in os.listdir('/tmp/test_tempest_updater') if os.path.isfile(
+                    os.path.join('/tmp/test_tempest_updater', name))]) > 0:
+                upload_test_cases_in_polarion(path='/tmp/test_tempest_updater')
+                print "\n wait for 5 minutes after importing test cases before update test run\n "
+                time.sleep(5 * 60)
         else:
             print "All test cases from xml file are exist in Polarion"
 

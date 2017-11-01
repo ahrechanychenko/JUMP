@@ -9,7 +9,7 @@ source venv/bin/activate
 
 .prepare_pylarion.sh
 
-#export path to RH certificate
+export path to RH certificate
 export REQUESTS_CA_BUNDLE=/etc/pki/ca-trust/source/anchors/...RH_CERT...
 
 ```

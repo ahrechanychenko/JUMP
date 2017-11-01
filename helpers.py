@@ -271,34 +271,19 @@ def get_project_for_tempest_path(tempest_path):
     :param tempest_path: str, tempest full path
     :return: str, project_id
     """
-    if any(("cinder" in tempest_path, "volume" in tempest_path)):
-        if "compute" in tempest_path.rsplit('[')[1].split(',')[0]:
-            return "Nova"
-        elif any(("neutron" in tempest_path.rsplit('[')[1].split(',')[0],
-                  "network" in tempest_path.rsplit('[')[1].split(',')[0])):
-            return "Neutron"
-        else:
-            return "Cinder"
-    elif "image" in tempest_path:
-        if "compute" in tempest_path:
-            return "Nova"
-        elif any(("neutron" in tempest_path, "network" in tempest_path)):
-            return "Neutron"
-        elif "volume" in tempest_path:
-            return "Cinder"
-        else:
-            return "Glance"
-    elif "compute" in tempest_path:
-        return "Nova"
-    elif any(("neutron" in tempest_path, "network" in tempest_path)):
-        return "Neutron"
-    elif "object_storage" in tempest_path:
-        return "Ceph"
-    elif "identity" in tempest_path:
-        return "Keystone"
+    #get tempest component from api test
+    component = {"compute":"Nova", "network":"Neutron", "image":"Glance",
+                 "object_storage":"Ceph", "volume":"Cinder", "identity":"Keystone"}
+
+    if tempest_path.split(".",3)[1] == "api":
+        try:
+            project = component[tempest_path.split(".",3)[2]]
+        except KeyError:
+            project = "Unclassified"
     else:
-        print "Cannot find project for {}. Set to default - PolarionTesting".format(tempest_path)
-        return "Polarion-testing"
+        project = "Unclassified"
+
+    return project
 
 
 def check_tempest_test_in_polarion(tempest_lst, xml_dir, project):
@@ -310,7 +295,6 @@ def check_tempest_test_in_polarion(tempest_lst, xml_dir, project):
     by default - '/tmp/test_tempest_updater'
     """
     automation_test_id_dict = get_polarion_tempest_test_cases(project)
-    # print test with exist in polarion but didn't exist in upstream
     generated_list = []
     for test in tempest_lst:
         print "check test {}".format(test)

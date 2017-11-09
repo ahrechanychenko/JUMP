@@ -62,6 +62,8 @@ def process_xml(out_xml, custom_fields, properties,
                 full_name = "{}.{}".format(classname, name)
                 full_name_without_uuid = re.match(
                     r'(.*)\[(.*id-)*(.*)\].*', full_name).group(1)
+                if full_name_without_uuid.split(".")[0] != "tempest":
+                    full_name_without_uuid = "tempest."+full_name_without_uuid
                 if full_name_without_uuid not in polarion_tempest_test_cases.keys():
                     print "Test with automation-test id {} not exist in Polarion.Skip it".format(full_name_without_uuid)
                     continue
@@ -298,16 +300,20 @@ def check_tempest_test_in_polarion(tempest_lst, xml_dir, project):
     generated_list = []
     for test in tempest_lst:
         print "check test {}".format(test)
-        if test.split("[")[0] not in automation_test_id_dict:
-            generated_list.append(test.split("[")[0])
+        if test.split("[")[0].split(".")[0] == "tempest":
+            automation_test_id = test.split("[")[0]
+        else:
+            automation_test_id = "tempest." + test.split("[")[0]
+        if automation_test_id not in automation_test_id_dict:
+            generated_list.append(automation_test_id)
             generate_testcase_xml_file(
                 file_path=xml_dir,
                 project_id=project,
                 posneg="negative" if "negative" in test else "positive",
                 title="{}".format(
-                    test.split("[")[0].rsplit('.', 1)[1]),
+                    automation_test_id.rsplit('.', 1)[1]),
                 description="",
-                automation_test_id=test.split("[")[0],
+                automation_test_id=automation_test_id,
                 component=get_project_for_tempest_path(test))
         else:
             print "tempest test {} exist in Polarion {} project " \

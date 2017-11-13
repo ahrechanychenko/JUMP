@@ -38,3 +38,5 @@ If you want to sync test cases from xml with test cases with automation-test-id:
 If you want to attach Jenkins build URL where test was execute - add "--jenkins_build_url $JENKINS_BUILD_URL"
 
 In case of any import errors the logs can be found here: http://ops-qe-logstash-2.rhev-ci-vms.eng.rdu2.redhat.com:9981/polarion/RHELOpenStackPlatform/
+
+Due to unstable pylarion connection to Polarion and in case of "Cannot connect to Polarion Server" error wait for some time and re-run jump tool

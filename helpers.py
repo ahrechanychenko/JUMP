@@ -446,8 +446,8 @@ def update_test_cases_with_tempest_tests(xml_file, project, path, dry_run):
         if len([name for name in os.listdir(path) if os.path.isfile(
                 os.path.join(path, name))]) > 0:
             upload_test_cases_in_polarion(path=path)
-            print "\n wait for 5 minutes after importing test cases before update test run\n "
-            time.sleep(5 * 60)
+            print "\n wait for 10 minutes after importing test cases before update test run\n "
+            time.sleep(10 * 60)
         else:
             print "All test cases from xml file are exist in Polarion"
 

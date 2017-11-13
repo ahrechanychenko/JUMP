@@ -187,24 +187,27 @@ def get_polarion_tempest_test_cases(project):
         Returns:
             automation_test_id_dict:, dict {automation-test-id:test_case_id}
     """
-    for i in range(0, 50):
+    for i in range(0, 5):
         try:
             test_cases = work_item.TestCase.query(
                 query="automation-test-id:tempest.* AND automation-env:001",
                 project_id=project, fields=["automation-test-id", "work_item_id"])
             break
         except SSLError:
+            time.sleep(60)
             continue
         except WebFault:
+            time.sleep(60)
             continue
         except:
+            time.sleep(60)
             continue
 
     try:
         test_cases
     except NameError:
         test_cases = None
-        print "Cannot connect to Polarion Server in 50 attemts"
+        print "Cannot connect to Polarion Server in 5 minutes."
         exit(1)
 
     automation_test_id_dict = {}

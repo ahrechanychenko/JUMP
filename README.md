@@ -23,7 +23,7 @@ To upload manual test results to Polarion:
 python jump.py --testrun-id=$TESTRUNID  --testcases=$TEST_CASES
 
 '$TESTRUNID' - polarion test_run_id,
-'$TEST_CASES' - "test_case_id1:result(passed|failed),test_case_id2:result(passed|failed)..."
+'$TEST_CASES' - "test_case_id1=result(passed|failed),test_case_id2=result(passed|failed)..."
 ```
 
 To upload tempest test results

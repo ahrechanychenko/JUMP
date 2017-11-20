@@ -194,12 +194,15 @@ def get_polarion_tempest_test_cases(project):
                 project_id=project, fields=["automation-test-id", "work_item_id"])
             break
         except SSLError:
+            print "failed {}/5 attempt to connect. Get one minute timeout".format(i+1)
             time.sleep(60)
             continue
         except WebFault:
+            print "failed {}/5 attempt to connect. Get one minute timeout".format(i+1)
             time.sleep(60)
             continue
         except:
+            print "failed {}/5 attempt to connect. Get one minute timeout".format(i+1)
             time.sleep(60)
             continue
 
